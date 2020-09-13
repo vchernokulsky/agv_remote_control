@@ -1,15 +1,23 @@
+#include "JoystickEventsDataSource.h"
+#include "JoystickEventsProcessor.h"
+#include "JoystickEventsSink.h"
+
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
-#include <esp_log.h>
 
-extern "C" [[noreturn]] void app_main();
+extern "C" void app_main();
 
-[[noreturn]] void app_main() {
+void app_main() {
     vTaskDelay(pdMS_TO_TICKS(1000));
 
-    for (;;) {
-        ESP_LOGI("Tag", "Hello World!!!");
+    auto *pJoystickEventsDataSource = new JoystickEventsDataSource();
+    pJoystickEventsDataSource->runTask("JoystickEventsDataSource", 2, 4 * configMINIMAL_STACK_SIZE);
 
-        vTaskDelay(pdMS_TO_TICKS(1000));
-    }
+    auto *pJoystickEventsProcessor = new JoystickEventsProcessor(
+            pJoystickEventsDataSource->joystickRawEventsQueueHandler,
+            JoystickEventsDataSource::getMaxPossibleValue());
+    pJoystickEventsProcessor->runTask("JoystickEventsProcessor", 2, 4 * configMINIMAL_STACK_SIZE);
+
+    auto *pJoystickEventsSink = new JoystickEventsSink(pJoystickEventsProcessor->joystickSpeedEventsQueueHandler);
+    pJoystickEventsSink->runTask("JoystickEventsSink", 3, 4 * configMINIMAL_STACK_SIZE);
 }
