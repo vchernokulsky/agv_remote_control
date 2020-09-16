@@ -34,11 +34,20 @@ void app_main() {
         vTaskDelay(pdMS_TO_TICKS(500));
     ESP_LOGI("Main", "Wi-Fi Client Started...");
 
-    ESP_LOGI("Main", "Wi-Fi WPS Connection Starting...");
-    wiFiManager.start_wps();
+//    ESP_LOGI("Main", "Wi-Fi WPS Connection Starting...");
+//    wiFiManager.start_wps();
+//    while(!wiFiManager.isWiFiConnectionEstablished)
+//        vTaskDelay(pdMS_TO_TICKS(500));
+//    ESP_LOGI("Main", "Wi-Fi WPS Connection Finished...");
+
+// WPS or Direct Connection
+
+    ESP_LOGI("Main", "Direct Wi-Fi Connection Starting...");
+    wiFiManager.connect("???", "???");
     while(!wiFiManager.isWiFiConnectionEstablished)
         vTaskDelay(pdMS_TO_TICKS(500));
-    ESP_LOGI("Main", "Wi-Fi WPS Connection Finished...");
+    ESP_LOGI("Main", "Direct Wi-Fi Connection Finished...");
+
 
     MDnsManager mDnsManager;
 
@@ -46,37 +55,11 @@ void app_main() {
     ip4_addr_t rosManagerIp4 = {};
     uint16_t rosManagerPort = 0;
 
-    for(;;) {
-        bool lookupResult = mDnsManager.lookupRosMaster(rosManagerHost, rosManagerIp4, rosManagerPort);
-
-        if (lookupResult) {
-            ESP_LOGI("", "%s:%d; IP4: " IPSTR, rosManagerHost.c_str(), rosManagerPort, IP2STR(&rosManagerIp4));
-        } else {
-            ESP_LOGI("", "Lookup failed!");
-        }
+    while(!mDnsManager.lookupRosMaster(rosManagerHost, rosManagerIp4, rosManagerPort)) {
+        ESP_LOGI("Main", "mDNS Lookup failed!");
 
         vTaskDelay(pdMS_TO_TICKS(3000));
-        ESP_LOGI("", "");
     }
 
-//    ESP_LOGI("Main", "Working...");
-//    vTaskDelay(pdMS_TO_TICKS(5000));
-//    ESP_LOGI("Main", "Worked...");
-//
-//    ESP_LOGI("Main", "Stoping WPS...");
-//    wiFiManager.stop_wps();
-//    ESP_LOGI("Main", "Stoped WPS...");
-//
-//    ESP_LOGI("Main", "Wi-Fi Disconnection Starting...");
-//    wiFiManager.disconnect();
-//    while(wiFiManager.isWiFiConnectionEstablished)
-//        vTaskDelay(pdMS_TO_TICKS(500));
-//    ESP_LOGI("Main", "Wi-Fi Disconnection Finished...");
-
-//    ESP_LOGI("Main", "Wi-Fi Connection Starting...");
-//    wiFiManager.connect();
-//    while(!wiFiManager.isWiFiConnectionEstablished)
-//        vTaskDelay(pdMS_TO_TICKS(500));
-//    ESP_LOGI("Main", "Wi-Fi Connection Finished...");
-
+    ESP_LOGI("Main", "ROS Master: " IPSTR ":%d", IP2STR(&rosManagerIp4), rosManagerPort);
 }

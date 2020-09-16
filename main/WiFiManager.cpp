@@ -69,6 +69,21 @@ void WiFiManager::connect() {
     ESP_ERROR_CHECK(esp_wifi_connect());
 }
 
+void WiFiManager::connect(const char *ssid, const char *password) {
+    assert(isWiFiClientStarted);
+    assert(!isWiFiConnectionEstablished);
+
+    wifi_config_t wifiConfig;
+    strlcpy((char *)wifiConfig.sta.ssid, ssid, sizeof(wifiConfig.sta.ssid));
+    strlcpy((char *)wifiConfig.sta.password, password, sizeof(wifiConfig.sta.password));
+    wifiConfig.sta.threshold.authmode = WIFI_AUTH_WPA2_PSK;
+    wifiConfig.sta.pmf_cfg.capable = true;
+    wifiConfig.sta.pmf_cfg.required = false;
+
+    ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_STA, &wifiConfig));
+    ESP_ERROR_CHECK(esp_wifi_connect());
+}
+
 void WiFiManager::disconnect() {
     assert(isWiFiClientStarted);
     assert(isWiFiConnectionEstablished);
@@ -106,9 +121,12 @@ void WiFiManager::wiFiEventHandler(__unused esp_event_base_t eventBase,
             isWiFiConnectionEstablished = true;
             break;
         case WIFI_EVENT_STA_DISCONNECTED:
-            ESP_LOGI(LogTag, "ESP32 station disconnected from AP");
-            isWiFiConnectionEstablished = false;
-            break;
+            {
+                auto *event = (wifi_event_sta_disconnected_t *)eventData;
+                ESP_LOGI(LogTag, "ESP32 station disconnected from AP. Reason: %d", event->reason);
+                isWiFiConnectionEstablished = false;
+                break;
+            }
         case WIFI_EVENT_STA_WPS_ER_SUCCESS:
             {
                 ESP_LOGI(LogTag, "ESP32 station WPS succeeds in enrollee mode");

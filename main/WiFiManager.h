@@ -28,6 +28,7 @@ public:
     void stop_wps();
 
     void connect();
+    void connect(const char *ssid, const char *password);
     void disconnect();
 
     //TODO: Right now `connect` can establish connection after successful WPS authentication only.
