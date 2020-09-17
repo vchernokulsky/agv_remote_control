@@ -56,6 +56,8 @@ JoystickSpeedEvent JoystickEventsProcessor::convertRawEventToSpeedEvent(Joystick
     double linearSpeed = MaxLinearSpeed * ((linearSpeedRawValue - middleValue) / middleValue);
     double angularSpeed = MaxAngularSpeed * ((angularSpeedRawValue - middleValue) / middleValue);
 
+    angularSpeed = -angularSpeed; // to make movement direction correspond to joystick direction
+
     return {linearSpeed, angularSpeed};
 }
 

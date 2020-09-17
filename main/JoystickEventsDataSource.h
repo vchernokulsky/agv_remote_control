@@ -16,7 +16,7 @@ class JoystickEventsDataSource: public TaskBase {
 private:
     const char* LogTag = "JoystickEventsDataSource";
 
-    const uint32_t MEASUREMENT_INTERVAL = 10; // ms
+    const uint32_t MEASUREMENT_INTERVAL = 1000; // ms
 
     static const adc_bits_width_t ADC_BITS_WIDTH = ADC_WIDTH_BIT_12;
 
