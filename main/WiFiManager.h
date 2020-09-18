@@ -31,9 +31,6 @@ public:
     void connect(const char *ssid, const char *password);
     void disconnect();
 
-    //TODO: Right now `connect` can establish connection after successful WPS authentication only.
-    //      Will be better to have in the future the `connect(ssid, password)` method to establish direct connection with out WPS.
-
 private:
     static void wiFiEventHandlerWrapper(void* eventHandlerArg,
                                  esp_event_base_t eventBase,
@@ -45,7 +42,7 @@ private:
                                                int32_t eventId,
                                                void* eventData);
 
-    void wiFiEventHandler(__unused esp_event_base_t eventBase, int32_t eventId, void *eventData);
+    void wiFiEventHandler(esp_event_base_t eventBase, int32_t eventId, void *eventData);
 
     void gotIpEventHandler(esp_event_base_t eventBase, int32_t eventId, void *eventData);
 
