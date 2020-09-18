@@ -7,33 +7,20 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <esp_log.h>
-#include <driver/adc.h>
-#include <esp_adc_cal.h>
 
 JoystickManager::JoystickManager(uint32_t rosMasterAddress, uint16_t rosMasterPort)
     : rosMasterAddress(rosMasterAddress),
       rosMasterPort(rosMasterPort),
       publisher(TopicName, &twistMsg) {
-    initializeADCDriver();
+    joystickController.calibrateCenter(xCenter, yCenter);
     initializeConnectionToRos();
-}
-
-void JoystickManager::initializeADCDriver() {
-    ESP_LOGV(LogTag, "ADC Two Point Calibration: %s",
-             esp_adc_cal_check_efuse(ESP_ADC_CAL_VAL_EFUSE_TP) == ESP_OK ? "Supported" : "Not Supported");
-    ESP_LOGV(LogTag, "ADC VRef Calibration: %s",
-             esp_adc_cal_check_efuse(ESP_ADC_CAL_VAL_EFUSE_VREF) == ESP_OK ? "Supported" : "Not Supported");
-
-    ESP_ERROR_CHECK(adc1_config_width(ADC_BITS_WIDTH));
-    ESP_ERROR_CHECK(adc1_config_channel_atten(X_AXIS_ADC_CHANNEL, ADC_ATTEN_DB_11));
-    ESP_ERROR_CHECK(adc1_config_channel_atten(Y_AXIS_ADC_CHANNEL, ADC_ATTEN_DB_11));
 }
 
 //TODO: implement error handling
 void JoystickManager::initializeConnectionToRos() {
     nodeHandle.initNode(rosMasterAddress, rosMasterPort);
     while (!nodeHandle.connected()) {
-        ESP_LOGI(LogTag, "Wait connection of NodeHandle...");
+        ESP_LOGI(LogTag, "Wait connection to ROS Master...");
 
         nodeHandle.spinOnce();
 
@@ -45,23 +32,13 @@ void JoystickManager::initializeConnectionToRos() {
 }
 
 bool JoystickManager::joystickFlow() {
-    uint32_t xRawValue;
-    uint32_t yRawValue;
-
-    if (!collectJoystickPosition(xRawValue, yRawValue)) {
-        ESP_LOGE(LogTag, "Can't collect joystick position from ADC");
+    uint32_t xValue, yValue;
+    if (!joystickController.collectPosition(xValue, yValue)) {
+        ESP_LOGE(LogTag, "Can't collect joystick position");
         return false;
     }
 
-    uint32_t xValue;
-    uint32_t yValue;
-    if (!smoothJoystickPosition(xRawValue, yRawValue, xValue, yValue)) {
-        ESP_LOGE(LogTag, "Can't smooth joystick position");
-        return false;
-    }
-
-    double linearSpeed;
-    double angularSpeed;
+    double linearSpeed, angularSpeed;
     if (!convertJoystickPosition(xValue, yValue, linearSpeed, angularSpeed)) {
         ESP_LOGE(LogTag, "Can't convert joystick position");
         return false;
@@ -75,40 +52,34 @@ bool JoystickManager::joystickFlow() {
     return true;
 }
 
-bool JoystickManager::collectJoystickPosition(uint32_t &xRawValue, uint32_t &yRawValue) {
-    xRawValue = adc1_get_raw(X_AXIS_ADC_CHANNEL);
-    yRawValue = adc1_get_raw(Y_AXIS_ADC_CHANNEL);
-
-    return xRawValue != -1 && yRawValue != -1;
-}
-
-bool JoystickManager::smoothJoystickPosition(uint32_t xRawValue, uint32_t yRawValue, uint32_t &xValue, uint32_t &yValue) {
-    xValue = xRawValue;
-    yValue = yRawValue;
-    return true;
-}
-
 bool JoystickManager::convertJoystickPosition(uint32_t xValue, uint32_t yValue, double &linearSpeed, double &angularSpeed) {
     //TODO: implement correction of zero-point (return 0 around middleValue±10)
 
-    double linearSpeedRawValue = yValue;
-    double angularSpeedRawValue = xValue;
-    uint32_t maxPossibleValue = pow(2, 9 + ADC_BITS_WIDTH) - 1;
-    double middleValue = (maxPossibleValue - 1) / 2.0;
+    double linearSpeedValue = yValue;
+    double angularSpeedValue = xValue;
 
-    linearSpeed = MaxLinearSpeed * ((linearSpeedRawValue - middleValue) / middleValue);
-    angularSpeed = MaxAngularSpeed * ((angularSpeedRawValue - middleValue) / middleValue);
+    linearSpeed = MaxLinearSpeed * ((linearSpeedValue - (double)yCenter) / (double)yCenter);
+    angularSpeed = MaxAngularSpeed * ((angularSpeedValue - (double)xCenter) / (double)xCenter);
 
-    angularSpeed = -angularSpeed; // to make movement direction correspond to joystick direction
+    linearSpeed = -linearSpeed; // to make movement direction correspond to joystick direction
+
+    //TODO: remove magick constants
+    // ignore noise around joystick center
+    if (abs(linearSpeed) < 0.05)
+        linearSpeed = 0;
+    if (abs(angularSpeed) < 0.05)
+        angularSpeed = 0;
 
     return true;
 }
 
 //TODO: implement error handling
 bool JoystickManager::sendNavigationMessage(double linearSpeed, double angularSpeed) {
-    twistMsg.linear.x = linearSpeed;
-    twistMsg.angular.z = angularSpeed;
-    publisher.publish(&twistMsg);
+    if (linearSpeed != 0 || angularSpeed != 0) { //TODO: probably will be problem with != 0 for double
+        twistMsg.linear.x = linearSpeed;
+        twistMsg.angular.z = angularSpeed;
+        publisher.publish(&twistMsg);
+    }
 
     nodeHandle.spinOnce();
 

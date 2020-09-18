@@ -73,7 +73,7 @@ void WiFiManager::connect(const char *ssid, const char *password) {
     assert(isWiFiClientStarted);
     assert(!isWiFiConnectionEstablished);
 
-    wifi_config_t wifiConfig;
+    wifi_config_t wifiConfig; //TODO: set 0-s (i.e. memset(&wifi_config, 0, sizeof(wifi_config));)?
     strlcpy((char *)wifiConfig.sta.ssid, ssid, sizeof(wifiConfig.sta.ssid));
     strlcpy((char *)wifiConfig.sta.password, password, sizeof(wifiConfig.sta.password));
     wifiConfig.sta.threshold.authmode = WIFI_AUTH_WPA2_PSK;
@@ -187,7 +187,7 @@ void WiFiManager::gotIpEventHandler(__unused esp_event_base_t eventBase,
 }
 
 esp_wps_config_t WiFiManager::getWpsConfig() {
-    esp_wps_config_t espWpsConfig;
+    esp_wps_config_t espWpsConfig; //TODO: set 0-s (i.e. memset(&wifi_config, 0, sizeof(wifi_config));)?
 
     espWpsConfig.wps_type = WPS_TYPE_PBC;
 
