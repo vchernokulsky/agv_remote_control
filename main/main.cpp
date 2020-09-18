@@ -1,8 +1,6 @@
-#include "JoystickEventsDataSource.h"
-#include "JoystickEventsProcessor.h"
-#include "JoystickEventsSink.h"
 #include "WiFiManager.h"
 #include "MDnsManager.h"
+#include "JoystickManager.h"
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
@@ -53,14 +51,6 @@ void app_main() {
 
     ESP_LOGI("Main", "ROS Master: " IPSTR ":%d", IP2STR(&rosManagerIp4), rosManagerPort);
 
-    auto *pJoystickEventsDataSource = new JoystickEventsDataSource();
-    pJoystickEventsDataSource->runTask("JoystickEventsDataSource", 2, 4 * configMINIMAL_STACK_SIZE);
-
-    auto *pJoystickEventsProcessor = new JoystickEventsProcessor(
-            pJoystickEventsDataSource->joystickRawEventsQueueHandler,
-            JoystickEventsDataSource::getMaxPossibleValue());
-    pJoystickEventsProcessor->runTask("JoystickEventsProcessor", 2, 4 * configMINIMAL_STACK_SIZE);
-
-    auto *pJoystickEventsSink = new JoystickEventsSink(pJoystickEventsProcessor->joystickSpeedEventsQueueHandler, rosManagerIp4.addr, rosManagerPort);
-    pJoystickEventsSink->runTask("JoystickEventsSink", 3, 8 * configMINIMAL_STACK_SIZE);
+    auto *joystickManager = new JoystickManager(rosManagerIp4.addr, rosManagerPort);
+    joystickManager->runTask("JoystickManager", 2, 8 * configMINIMAL_STACK_SIZE);
 }
