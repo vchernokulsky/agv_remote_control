@@ -87,10 +87,9 @@ bool NavigationManager::sendNavigationMessage(double linearSpeed, double angular
     return publisher.publish(&twistMsg) > 0;
 }
 
-//TODO: Implement cancellation (required to leave resources after delete)
-[[noreturn]] void NavigationManager::task() {
+void NavigationManager::task() {
     TickType_t xLastWakeTime = xTaskGetTickCount();
-    for(;;) {
+    while(!isCancelled) {
         TickType_t delay = joystickFlow() ? MEASUREMENT_INTERVAL : 5000;
 
         nodeHandle.spinOnce(); //TODO: implement error handling?

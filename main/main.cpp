@@ -53,4 +53,12 @@ void app_main() {
 
     auto *navigationManager = new NavigationManager(rosManagerIp4.addr, rosManagerPort);
     navigationManager->runTask("JoystickManager", 2, 8 * configMINIMAL_STACK_SIZE);
+
+//    ESP_LOGI("Main", "Delay...");
+//    vTaskDelay(pdMS_TO_TICKS(20000));
+//    ESP_LOGI("Main", "Delay completed...");
+//
+//    ESP_LOGI("Main", "Start cancellation...");
+//    navigationManager->cancelTask(true);
+//    ESP_LOGI("Main", "Finish cancellation...");
 }

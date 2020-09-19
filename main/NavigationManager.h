@@ -54,7 +54,7 @@ private:
     bool convertJoystickPosition(uint32_t xValue, uint32_t yValue, double &linearSpeed, double &angularSpeed);
     bool sendNavigationMessage(double linearSpeed, double angularSpeed);
 
-    [[noreturn]] void task() override;
+    void task() override;
 
     bool readParam(const char *paramName, double &value);
 };

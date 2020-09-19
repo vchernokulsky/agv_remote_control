@@ -9,11 +9,22 @@
 #include <esp_log.h>
 
 void TaskBase::runTask(const char *taskName, BaseType_t taskPriority, uint32_t stackDepth) {
+    isCancelled = false;
+
     BaseType_t taskResult = xTaskCreate(&taskHandler, taskName, stackDepth, this, taskPriority, &taskHandle);
 
     if (taskResult != pdPASS) {
         ESP_LOGE(taskName, "Can't create task handler!");
         abort();
+    }
+}
+
+void TaskBase::cancelTask(bool waitCancellation) {
+    isCancelled = true;
+
+    if (waitCancellation) {
+        while (eTaskGetState(taskHandle) != eDeleted)
+            vTaskDelay(pdMS_TO_TICKS(1));
     }
 }
 

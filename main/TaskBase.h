@@ -7,13 +7,17 @@
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
+#include <atomic>
 
 class TaskBase {
 protected:
+    std::atomic_bool isCancelled = ATOMIC_VAR_INIT(false);
+
     TaskHandle_t taskHandle = nullptr;
 
 public:
     void runTask(const char *taskName, BaseType_t taskPriority, uint32_t stackDepth = configMINIMAL_STACK_SIZE);
+    void cancelTask(bool waitCancellation = false);
 
 private:
     static void taskHandler(void* parm);
