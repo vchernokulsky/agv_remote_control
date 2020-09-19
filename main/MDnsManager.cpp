@@ -18,7 +18,7 @@ bool MDnsManager::lookupRosMaster(std::string &rosMasterHost, ip4_addr_t &rosMas
     // FYI: Send two queries (_srv and _a) because _ptr can't return IP4 address in most cases.
     // Looks like a bug because response packet from mDNS server has it...
     mdns_result_t *result = nullptr;
-    ESP_ERROR_CHECK(mdns_query_srv(RosMasterInstanceName, RosMasterServiceType, RosMasterProtocol, LookupTimeout, &result));
+    ESP_ERROR_CHECK(mdns_query_srv(ROS_MASTER_INSTANCE_NAME, ROS_MASTER_SERVICE_TYPE, ROS_MASTER_PROTOCOL, LOOKUP_TIMEOUT, &result));
 
     if (!result)
         return false;
@@ -29,7 +29,7 @@ bool MDnsManager::lookupRosMaster(std::string &rosMasterHost, ip4_addr_t &rosMas
     mdns_query_results_free(result);
 
     esp_ip4_addr_t address;
-    esp_err_t queryResult = mdns_query_a(rosMasterHost.c_str(), LookupTimeout, &address);
+    esp_err_t queryResult = mdns_query_a(rosMasterHost.c_str(), LOOKUP_TIMEOUT, &address);
     if (queryResult != ESP_OK) // i.e. in case ESP_ERR_NOT_FOUND
         return false;
 

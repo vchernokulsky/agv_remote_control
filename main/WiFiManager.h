@@ -12,7 +12,7 @@
 
 class WiFiManager {
 private:
-    const char *LogTag = "WiFiManager";
+    const char *LOG_TAG = "WiFiManager";
 
     esp_wps_config_t wpsConfig = {};
 public:

@@ -11,9 +11,9 @@
 #include <esp_adc_cal.h>
 
 void JoystickController::initializeADCDriver() {
-    ESP_LOGV(LogTag, "ADC Two Point Calibration: %s",
+    ESP_LOGV(LOG_TAG, "ADC Two Point Calibration: %s",
              esp_adc_cal_check_efuse(ESP_ADC_CAL_VAL_EFUSE_TP) == ESP_OK ? "Supported" : "Not Supported");
-    ESP_LOGV(LogTag, "ADC VRef Calibration: %s",
+    ESP_LOGV(LOG_TAG, "ADC VRef Calibration: %s",
              esp_adc_cal_check_efuse(ESP_ADC_CAL_VAL_EFUSE_VREF) == ESP_OK ? "Supported" : "Not Supported");
 
     ESP_ERROR_CHECK(adc1_config_width(ADC_BITS_WIDTH));
@@ -32,7 +32,7 @@ bool JoystickController::calibrateCenter(uint32_t &xCenter, uint32_t &yCenter) {
     for(int measurementNumber = 0; measurementNumber < NumberOfMeasurements; measurementNumber++) {
         uint32_t xRawValue, yRawValue;
         if(!collectRawPosition(xRawValue, yRawValue)) {
-            ESP_LOGE(LogTag, "Can't calibrate center.");
+            ESP_LOGE(LOG_TAG, "Can't calibrate center.");
             return false;
         }
 
@@ -43,7 +43,7 @@ bool JoystickController::calibrateCenter(uint32_t &xCenter, uint32_t &yCenter) {
     xCenter = x / NumberOfMeasurements;
     yCenter = y / NumberOfMeasurements;
 
-    ESP_LOGI(LogTag, "Calibrated Joystick Center: (%u, %u)", xCenter, yCenter);
+    ESP_LOGI(LOG_TAG, "Calibrated Joystick Center: (%u, %u)", xCenter, yCenter);
 
     return true;
 }

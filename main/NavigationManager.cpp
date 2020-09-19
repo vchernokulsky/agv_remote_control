@@ -11,7 +11,7 @@
 NavigationManager::NavigationManager(uint32_t rosMasterAddress, uint16_t rosMasterPort)
     : rosMasterAddress(rosMasterAddress),
       rosMasterPort(rosMasterPort),
-      publisher(TopicName, &twistMsg) {
+      publisher(TOPIC_NAME, &twistMsg) {
     joystickController.calibrateCenter(xCenter, yCenter);
     initializeConnectionToRos();
 }
@@ -19,21 +19,21 @@ NavigationManager::NavigationManager(uint32_t rosMasterAddress, uint16_t rosMast
 void NavigationManager::initializeConnectionToRos() {
     nodeHandle.initNode(rosMasterAddress, rosMasterPort);
     while (!nodeHandle.connected()) {
-        ESP_LOGI(LogTag, "Wait connection to ROS Master...");
+        ESP_LOGI(LOG_TAG, "Wait connection to ROS Master...");
 
         nodeHandle.spinOnce(); //TODO: implement error handling?
 
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
-    ESP_LOGI(LogTag, "Connected to ROS Master");
+    ESP_LOGI(LOG_TAG, "Connected to ROS Master");
 
-    if (!readParam(MaxLinearSpeedParam, MaxLinearSpeed))
-        ESP_LOGW(LogTag, "Use default %s param value: %f", MaxLinearSpeedParam, MaxLinearSpeed);
-    if (!readParam(MaxAngularSpeedParam, MaxAngularSpeed))
-        ESP_LOGW(LogTag, "Use default %s param value: %f", MaxAngularSpeedParam, MaxAngularSpeed);
+    if (!readParam(MAX_LINEAR_SPEED_PARAM, MaxLinearSpeed))
+        ESP_LOGW(LOG_TAG, "Use default %s param value: %f", MAX_LINEAR_SPEED_PARAM, MaxLinearSpeed);
+    if (!readParam(MAX_ANGULAR_SPEED_PARAM, MaxAngularSpeed))
+        ESP_LOGW(LOG_TAG, "Use default %s param value: %f", MAX_ANGULAR_SPEED_PARAM, MaxAngularSpeed);
 
     if(!nodeHandle.advertise(publisher)) {
-        ESP_LOGE(LogTag, "Can't advertise navigation publisher");
+        ESP_LOGE(LOG_TAG, "Can't advertise navigation publisher");
         //TODO: reconnect?
     }
 }
@@ -41,20 +41,20 @@ void NavigationManager::initializeConnectionToRos() {
 bool NavigationManager::joystickFlow() {
     uint32_t xValue, yValue;
     if (!joystickController.collectPosition(xValue, yValue)) {
-        ESP_LOGE(LogTag, "Can't collect joystick position");
+        ESP_LOGE(LOG_TAG, "Can't collect joystick position");
         return false;
     }
 
     double linearSpeed, angularSpeed;
     if (!convertJoystickPosition(xValue, yValue, linearSpeed, angularSpeed)) {
-        ESP_LOGE(LogTag, "Can't convert joystick position");
+        ESP_LOGE(LOG_TAG, "Can't convert joystick position");
         return false;
     }
 
     const double tolerance = 0.01;
     if (abs(linearSpeed) > tolerance || abs(angularSpeed) > tolerance) {
         if (!sendNavigationMessage(linearSpeed, angularSpeed)) {
-            ESP_LOGE(LogTag, "Can't send navigation message");
+            ESP_LOGE(LOG_TAG, "Can't send navigation message");
             return false;
         }
     }
@@ -104,12 +104,12 @@ bool NavigationManager::readParam(const char *paramName, double &value) {
 
     float floatValue;
     if (!nodeHandle.getParam(paramName, &floatValue)) {
-        ESP_LOGW(LogTag, "Can't read %s param", paramName);
+        ESP_LOGW(LOG_TAG, "Can't read %s param", paramName);
         return false;
     }
 
     value = (double) floatValue;
 
-    ESP_LOGD(LogTag, "Read %s param: %f", paramName, value);
+    ESP_LOGD(LOG_TAG, "Read %s param: %f", paramName, value);
     return true;
 }

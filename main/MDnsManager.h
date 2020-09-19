@@ -11,11 +11,11 @@
 #include <lwip/ip4_addr.h>
 
 class MDnsManager {
-    const uint32_t LookupTimeout = 3000; // ms
+    const uint32_t LOOKUP_TIMEOUT = 3000; // ms
 public:
-    const char *RosMasterInstanceName = "ROS Master";
-    const char *RosMasterServiceType = "_ros-master";
-    const char *RosMasterProtocol = "_tcp";
+    const char *ROS_MASTER_INSTANCE_NAME = "ROS Master";
+    const char *ROS_MASTER_SERVICE_TYPE = "_ros-master";
+    const char *ROS_MASTER_PROTOCOL = "_tcp";
 
     MDnsManager();
 

@@ -19,17 +19,17 @@
 
 class NavigationManager: public TaskBase {
 private:
-    const char* LogTag = "NavigationManager";
+    const char* LOG_TAG = "NavigationManager";
 
     const uint32_t MEASUREMENT_INTERVAL = 10; // ms
 
-    const char *MaxLinearSpeedParam = "/agv_remote_control/max_linear_speed";
-    const char *MaxAngularSpeedParam = "/agv_remote_control/max_angular_speed";
+    const char *MAX_LINEAR_SPEED_PARAM = "/agv_remote_control/max_linear_speed";
+    const char *MAX_ANGULAR_SPEED_PARAM = "/agv_remote_control/max_angular_speed";
+
+    const char* TOPIC_NAME = "/turtle1/cmd_vel";
 
     double MaxLinearSpeed = 1; // m/sec
     double MaxAngularSpeed = M_PI_2; // rad/sec
-
-    const char* TopicName = "/turtle1/cmd_vel";
 
     uint32_t rosMasterAddress;
     uint16_t rosMasterPort;
