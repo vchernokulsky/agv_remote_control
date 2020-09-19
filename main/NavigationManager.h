@@ -23,8 +23,11 @@ private:
 
     const uint32_t MEASUREMENT_INTERVAL = 10; // ms
 
-    const double MaxLinearSpeed = 1; // m/sec
-    const double MaxAngularSpeed = M_PI_2; // rad/sec
+    const char *MaxLinearSpeedParam = "/agv_remote_control/max_linear_speed";
+    const char *MaxAngularSpeedParam = "/agv_remote_control/max_angular_speed";
+
+    double MaxLinearSpeed = 1; // m/sec
+    double MaxAngularSpeed = M_PI_2; // rad/sec
 
     const char* TopicName = "/turtle1/cmd_vel";
 
@@ -52,6 +55,8 @@ private:
     bool sendNavigationMessage(double linearSpeed, double angularSpeed);
 
     [[noreturn]] void task();
+
+    bool readParam(const char *paramName, double &value);
 };
 
 

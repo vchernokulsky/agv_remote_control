@@ -26,6 +26,12 @@ void NavigationManager::initializeConnectionToRos() {
 
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
+    ESP_LOGI(LogTag, "Connected to ROS Master");
+
+    if (!readParam(MaxLinearSpeedParam, MaxLinearSpeed))
+        ESP_LOGW(LogTag, "Use default %s param value: %f", MaxLinearSpeedParam, MaxLinearSpeed);
+    if (!readParam(MaxAngularSpeedParam, MaxAngularSpeed))
+        ESP_LOGW(LogTag, "Use default %s param value: %f", MaxAngularSpeedParam, MaxAngularSpeed);
 
     nodeHandle.advertise(publisher);
     nodeHandle.spinOnce();
@@ -94,4 +100,19 @@ bool NavigationManager::sendNavigationMessage(double linearSpeed, double angular
 
         vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(delay));
     }
+}
+
+bool NavigationManager::readParam(const char *paramName, double &value) {
+    assert(nodeHandle.connected());
+
+    float floatValue;
+    if (!nodeHandle.getParam(paramName, &floatValue)) {
+        ESP_LOGW(LogTag, "Can't read %s param", paramName);
+        return false;
+    }
+
+    value = (double) floatValue;
+
+    ESP_LOGD(LogTag, "Read %s param: %f", paramName, value);
+    return true;
 }
