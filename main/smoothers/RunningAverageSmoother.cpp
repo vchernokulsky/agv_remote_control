@@ -4,8 +4,7 @@
 
 #include "RunningAverageSmoother.h"
 
-RunningAverageSmoother::RunningAverageSmoother() {
-}
+RunningAverageSmoother::RunningAverageSmoother() = default;
 
 RunningAverageSmoother::RunningAverageSmoother(double k) : k(k) {
 }
