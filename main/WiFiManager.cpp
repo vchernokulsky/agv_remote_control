@@ -13,7 +13,7 @@
 #include <esp_wifi.h>
 #include <esp_supplicant/esp_wps.h>
 
-//TODO: check all ESP_LOG* and set more appropriate log evels
+//TODO: check all ESP_LOG* and set more appropriate log levels
 
 WiFiManager::WiFiManager() {
     ESP_ERROR_CHECK(esp_netif_init());
