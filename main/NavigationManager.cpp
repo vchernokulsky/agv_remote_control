@@ -16,13 +16,12 @@ NavigationManager::NavigationManager(uint32_t rosMasterAddress, uint16_t rosMast
     initializeConnectionToRos();
 }
 
-//TODO: implement error handling
 void NavigationManager::initializeConnectionToRos() {
     nodeHandle.initNode(rosMasterAddress, rosMasterPort);
     while (!nodeHandle.connected()) {
         ESP_LOGI(LogTag, "Wait connection to ROS Master...");
 
-        nodeHandle.spinOnce();
+        nodeHandle.spinOnce(); //TODO: implement error handling?
 
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
@@ -33,8 +32,10 @@ void NavigationManager::initializeConnectionToRos() {
     if (!readParam(MaxAngularSpeedParam, MaxAngularSpeed))
         ESP_LOGW(LogTag, "Use default %s param value: %f", MaxAngularSpeedParam, MaxAngularSpeed);
 
-    nodeHandle.advertise(publisher);
-    nodeHandle.spinOnce();
+    if(!nodeHandle.advertise(publisher)) {
+        ESP_LOGE(LogTag, "Can't advertise navigation publisher");
+        //TODO: reconnect?
+    }
 }
 
 bool NavigationManager::joystickFlow() {
@@ -50,9 +51,12 @@ bool NavigationManager::joystickFlow() {
         return false;
     }
 
-    if (!sendNavigationMessage(linearSpeed, angularSpeed)) {
-        ESP_LOGE(LogTag, "Can't send navigation message");
-        return false;
+    const double tolerance = 0.01;
+    if (abs(linearSpeed) > tolerance || abs(angularSpeed) > tolerance) {
+        if (!sendNavigationMessage(linearSpeed, angularSpeed)) {
+            ESP_LOGE(LogTag, "Can't send navigation message");
+            return false;
+        }
     }
 
     return true;
@@ -79,17 +83,10 @@ bool NavigationManager::convertJoystickPosition(uint32_t xValue, uint32_t yValue
     return true;
 }
 
-//TODO: implement error handling
 bool NavigationManager::sendNavigationMessage(double linearSpeed, double angularSpeed) {
-    if (linearSpeed != 0 || angularSpeed != 0) { //TODO: probably will be problem with != 0 for double
-        twistMsg.linear.x = linearSpeed;
-        twistMsg.angular.z = angularSpeed;
-        publisher.publish(&twistMsg);
-    }
-
-    nodeHandle.spinOnce();
-
-    return true;
+    twistMsg.linear.x = linearSpeed;
+    twistMsg.angular.z = angularSpeed;
+    return publisher.publish(&twistMsg) > 0;
 }
 
 //TODO: Implement cancellation (required to leave resources after delete)
@@ -97,6 +94,8 @@ bool NavigationManager::sendNavigationMessage(double linearSpeed, double angular
     TickType_t xLastWakeTime = xTaskGetTickCount();
     for(;;) {
         TickType_t delay = joystickFlow() ? MEASUREMENT_INTERVAL : 5000;
+
+        nodeHandle.spinOnce(); //TODO: implement error handling?
 
         vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(delay));
     }
