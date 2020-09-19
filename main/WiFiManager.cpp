@@ -192,7 +192,7 @@ esp_wps_config_t WiFiManager::getWpsConfig() {
     espWpsConfig.wps_type = WPS_TYPE_PBC;
 
     //TODO: move values to consts/config
-    strlcpy(espWpsConfig.factory_info.manufacturer, "???", sizeof(espWpsConfig.factory_info.manufacturer));
+    strlcpy(espWpsConfig.factory_info.manufacturer, "IntemsLab", sizeof(espWpsConfig.factory_info.manufacturer));
     strlcpy(espWpsConfig.factory_info.model_number, "0", sizeof(espWpsConfig.factory_info.model_number));
     strlcpy(espWpsConfig.factory_info.model_name, "Prototype", sizeof(espWpsConfig.factory_info.model_name));
     strlcpy(espWpsConfig.factory_info.device_name, "AGV Remote Control", sizeof(espWpsConfig.factory_info.device_name));
