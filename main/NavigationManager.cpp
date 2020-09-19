@@ -63,8 +63,6 @@ bool NavigationManager::joystickFlow() {
 }
 
 bool NavigationManager::convertJoystickPosition(uint32_t xValue, uint32_t yValue, double &linearSpeed, double &angularSpeed) {
-    //TODO: implement correction of zero-point (return 0 around middleValue±10)
-
     double linearSpeedValue = yValue;
     double angularSpeedValue = xValue;
 
@@ -73,11 +71,11 @@ bool NavigationManager::convertJoystickPosition(uint32_t xValue, uint32_t yValue
 
     linearSpeed = -linearSpeed; // to make movement direction correspond to joystick direction
 
-    //TODO: remove magick constants
     // ignore noise around joystick center
-    if (abs(linearSpeed) < 0.05)
+    const double tolerance = 0.08;
+    if (abs(linearSpeed) < tolerance)
         linearSpeed = 0;
-    if (abs(angularSpeed) < 0.05)
+    if (abs(angularSpeed) < tolerance)
         angularSpeed = 0;
 
     return true;
