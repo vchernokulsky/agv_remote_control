@@ -2,8 +2,8 @@
 // Created by Maxim Dobryakov on 18/09/2020.
 //
 
-#ifndef AGV_REMOTE_CONTROL_JOYSTICKMANAGER_H
-#define AGV_REMOTE_CONTROL_JOYSTICKMANAGER_H
+#ifndef AGV_REMOTE_CONTROL_NAVIGATIONMANAGER_H
+#define AGV_REMOTE_CONTROL_NAVIGATIONMANAGER_H
 
 #include "TaskBase.h"
 #include "JoystickController.h"
@@ -17,9 +17,9 @@
 #include <ros_lib/geometry_msgs/Twist.h>
 #include <ros_lib/geometry_msgs/Point.h>
 
-class JoystickManager: public TaskBase {
+class NavigationManager: public TaskBase {
 private:
-    const char* LogTag = "JoystickManager";
+    const char* LogTag = "NavigationManager";
 
     const uint32_t MEASUREMENT_INTERVAL = 10; // ms
 
@@ -41,7 +41,7 @@ private:
     geometry_msgs::Twist twistMsg;
 
 public:
-    JoystickManager(uint32_t rosMasterAddress, uint16_t rosMasterPort);
+    NavigationManager(uint32_t rosMasterAddress, uint16_t rosMasterPort);
 
 private:
     void initializeConnectionToRos();
@@ -55,4 +55,4 @@ private:
 };
 
 
-#endif //AGV_REMOTE_CONTROL_JOYSTICKMANAGER_H
+#endif //AGV_REMOTE_CONTROL_NAVIGATIONMANAGER_H

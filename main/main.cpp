@@ -1,6 +1,6 @@
 #include "WiFiManager.h"
 #include "MDnsManager.h"
-#include "JoystickManager.h"
+#include "NavigationManager.h"
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
@@ -51,6 +51,6 @@ void app_main() {
 
     ESP_LOGI("Main", "ROS Master: " IPSTR ":%d", IP2STR(&rosManagerIp4), rosManagerPort);
 
-    auto *joystickManager = new JoystickManager(rosManagerIp4.addr, rosManagerPort);
-    joystickManager->runTask("JoystickManager", 2, 8 * configMINIMAL_STACK_SIZE);
+    auto *navigationManager = new NavigationManager(rosManagerIp4.addr, rosManagerPort);
+    navigationManager->runTask("JoystickManager", 2, 8 * configMINIMAL_STACK_SIZE);
 }

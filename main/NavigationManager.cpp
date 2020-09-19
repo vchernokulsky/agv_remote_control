@@ -2,13 +2,13 @@
 // Created by Maxim Dobryakov on 18/09/2020.
 //
 
-#include "JoystickManager.h"
+#include "NavigationManager.h"
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <esp_log.h>
 
-JoystickManager::JoystickManager(uint32_t rosMasterAddress, uint16_t rosMasterPort)
+NavigationManager::NavigationManager(uint32_t rosMasterAddress, uint16_t rosMasterPort)
     : rosMasterAddress(rosMasterAddress),
       rosMasterPort(rosMasterPort),
       publisher(TopicName, &twistMsg) {
@@ -17,7 +17,7 @@ JoystickManager::JoystickManager(uint32_t rosMasterAddress, uint16_t rosMasterPo
 }
 
 //TODO: implement error handling
-void JoystickManager::initializeConnectionToRos() {
+void NavigationManager::initializeConnectionToRos() {
     nodeHandle.initNode(rosMasterAddress, rosMasterPort);
     while (!nodeHandle.connected()) {
         ESP_LOGI(LogTag, "Wait connection to ROS Master...");
@@ -31,7 +31,7 @@ void JoystickManager::initializeConnectionToRos() {
     nodeHandle.spinOnce();
 }
 
-bool JoystickManager::joystickFlow() {
+bool NavigationManager::joystickFlow() {
     uint32_t xValue, yValue;
     if (!joystickController.collectPosition(xValue, yValue)) {
         ESP_LOGE(LogTag, "Can't collect joystick position");
@@ -52,7 +52,7 @@ bool JoystickManager::joystickFlow() {
     return true;
 }
 
-bool JoystickManager::convertJoystickPosition(uint32_t xValue, uint32_t yValue, double &linearSpeed, double &angularSpeed) {
+bool NavigationManager::convertJoystickPosition(uint32_t xValue, uint32_t yValue, double &linearSpeed, double &angularSpeed) {
     //TODO: implement correction of zero-point (return 0 around middleValue±10)
 
     double linearSpeedValue = yValue;
@@ -74,7 +74,7 @@ bool JoystickManager::convertJoystickPosition(uint32_t xValue, uint32_t yValue, 
 }
 
 //TODO: implement error handling
-bool JoystickManager::sendNavigationMessage(double linearSpeed, double angularSpeed) {
+bool NavigationManager::sendNavigationMessage(double linearSpeed, double angularSpeed) {
     if (linearSpeed != 0 || angularSpeed != 0) { //TODO: probably will be problem with != 0 for double
         twistMsg.linear.x = linearSpeed;
         twistMsg.angular.z = angularSpeed;
@@ -87,7 +87,7 @@ bool JoystickManager::sendNavigationMessage(double linearSpeed, double angularSp
 }
 
 //TODO: Implement cancellation (required to leave resources after delete)
-[[noreturn]] void JoystickManager::task() {
+[[noreturn]] void NavigationManager::task() {
     TickType_t xLastWakeTime = xTaskGetTickCount();
     for(;;) {
         TickType_t delay = joystickFlow() ? MEASUREMENT_INTERVAL : 5000;
