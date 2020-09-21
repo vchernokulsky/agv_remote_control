@@ -43,7 +43,7 @@ bool JoystickController::calibrateCenter(uint32_t &xCenter, uint32_t &yCenter) {
     xCenter = x / NumberOfMeasurements;
     yCenter = y / NumberOfMeasurements;
 
-    ESP_LOGI(LOG_TAG, "Calibrated Joystick Center: (%u, %u)", xCenter, yCenter);
+    ESP_LOGD(LOG_TAG, "Calibrated Joystick Center: (%u, %u)", xCenter, yCenter);
 
     return true;
 }

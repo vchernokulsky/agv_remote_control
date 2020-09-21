@@ -13,8 +13,6 @@
 #include <esp_wifi.h>
 #include <esp_supplicant/esp_wps.h>
 
-//TODO: check all ESP_LOG* and set more appropriate log levels
-
 WiFiManager::WiFiManager() {
     ESP_ERROR_CHECK(esp_netif_init());
 }
@@ -109,35 +107,36 @@ void WiFiManager::wiFiEventHandler(__unused esp_event_base_t eventBase,
                                    __unused void* eventData) {
     switch (eventId) {
         case WIFI_EVENT_STA_START:
-            ESP_LOGI(LOG_TAG, "ESP32 station start");
+            ESP_LOGD(LOG_TAG, "STA start");
             isWiFiClientStarted = true;
             break;
         case WIFI_EVENT_STA_STOP:
-            ESP_LOGI(LOG_TAG, "ESP32 station stop");
+            ESP_LOGD(LOG_TAG, "STA stop");
             isWiFiClientStarted = false;
             break;
         case WIFI_EVENT_STA_CONNECTED:
-            ESP_LOGI(LOG_TAG, "ESP32 station connected to AP");
+            ESP_LOGD(LOG_TAG, "Connected to AP");
             isWiFiConnectionEstablished = true;
             break;
         case WIFI_EVENT_STA_DISCONNECTED:
             {
                 auto *event = (wifi_event_sta_disconnected_t *)eventData;
-                ESP_LOGI(LOG_TAG, "ESP32 station disconnected from AP. Reason: %d", event->reason);
+                ESP_LOGW(LOG_TAG, "Disconnected from AP. Reason: %d", event->reason);
                 isWiFiConnectionEstablished = false;
                 break;
             }
         case WIFI_EVENT_STA_WPS_ER_SUCCESS:
             {
-                ESP_LOGI(LOG_TAG, "ESP32 station WPS succeeds in enrollee mode");
+                ESP_LOGD(LOG_TAG, "WPS succeeds in enrollee mode");
 
                 //TODO: ESP-IDF v4.1 doesn't support multiple WPS credentials (fix present in master but not included to release).
                 //      Need to implement it later. See: https://github.com/espressif/esp-idf/commit/81f037a2999992fbe184b4b8871a4c670d8fd804
 
+                //TODO: remove later
                 wifi_config_t config;
                 ESP_ERROR_CHECK(esp_wifi_get_config(ESP_IF_WIFI_STA, &config));
-                ESP_LOGI(LOG_TAG, "SSID: %s", config.sta.ssid);
-                ESP_LOGI(LOG_TAG, "Password: %s", config.sta.password);
+                ESP_LOGV(LOG_TAG, "SSID: %s", config.sta.ssid);
+                ESP_LOGV(LOG_TAG, "Password: %s", config.sta.password);
 
                 /*
                  * If only one AP credential is received from WPS, there will be no event data and
@@ -150,7 +149,7 @@ void WiFiManager::wiFiEventHandler(__unused esp_event_base_t eventBase,
             break;
         case WIFI_EVENT_STA_WPS_ER_FAILED:
             {
-                ESP_LOGI(LOG_TAG, "ESP32 station WPS fails in enrollee mode");
+                ESP_LOGW(LOG_TAG, "WPS fails in enrollee mode");
 
                 wpsConfig = getWpsConfig();
 
@@ -161,7 +160,7 @@ void WiFiManager::wiFiEventHandler(__unused esp_event_base_t eventBase,
             break;
         case WIFI_EVENT_STA_WPS_ER_TIMEOUT:
             {
-                ESP_LOGI(LOG_TAG, "ESP32 station WPS timeout in enrollee mode");
+                ESP_LOGW(LOG_TAG, "WPS timeout in enrollee mode");
 
                 wpsConfig = getWpsConfig();
 
@@ -171,8 +170,7 @@ void WiFiManager::wiFiEventHandler(__unused esp_event_base_t eventBase,
             }
             break;
         default:
-            // Do Nothing
-            ESP_LOGI(LOG_TAG, "Default event id: %d", eventId);
+            ESP_LOGV(LOG_TAG, "Unhandled event id: %d", eventId);
             break;
     }
 }
@@ -183,7 +181,7 @@ void WiFiManager::gotIpEventHandler(__unused esp_event_base_t eventBase,
                                     void* eventData) {
     auto* event = (ip_event_got_ip_t*) eventData;
 
-    ESP_LOGI(LOG_TAG, "Got IP: " IPSTR, IP2STR(&event->ip_info.ip));
+    ESP_LOGV(LOG_TAG, "Got IP: " IPSTR, IP2STR(&event->ip_info.ip));
 }
 
 esp_wps_config_t WiFiManager::getWpsConfig() {

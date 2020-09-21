@@ -19,13 +19,13 @@ NavigationManager::NavigationManager(uint32_t rosMasterAddress, uint16_t rosMast
 void NavigationManager::initializeConnectionToRos() {
     nodeHandle.initNode(rosMasterAddress, rosMasterPort);
     while (!nodeHandle.connected()) {
-        ESP_LOGI(LOG_TAG, "Wait connection to ROS Master...");
+        ESP_LOGD(LOG_TAG, "Wait connection to ROS Master...");
 
         nodeHandle.spinOnce(); //TODO: implement error handling?
 
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
-    ESP_LOGI(LOG_TAG, "Connected to ROS Master");
+    ESP_LOGD(LOG_TAG, "Connected to ROS Master");
 
     if (!readParam(MAX_LINEAR_SPEED_PARAM, MaxLinearSpeed))
         ESP_LOGW(LOG_TAG, "Use default %s param value: %f", MAX_LINEAR_SPEED_PARAM.c_str(), MaxLinearSpeed);
