@@ -1,0 +1,17 @@
+menu "AGV WPS settings"
+    config WPS_MANUFACTURER
+        string "Manufacturer of RC device."
+        default "IntemsLab"
+
+    config WPS_MODEL_NUMBER
+        string "Model number (version) of RC device."
+        default "1.0"
+
+    config WPS_MODEL_NAME
+        string "Model name (name of version) of RC device."
+        default "Prototype"
+
+    config WPS_DEVICE_NAME
+        string "Device name."
+        default "AGV Remote Control"
+endmenu

@@ -923,6 +923,15 @@ CONFIG_WIFI_PROV_AUTOSTOP_TIMEOUT=30
 CONFIG_WPA_MBEDTLS_CRYPTO=y
 # CONFIG_WPA_TLS_V12 is not set
 # end of Supplicant
+
+#
+# AGV WPS settings
+#
+CONFIG_WPS_MANUFACTURER="IntemsLab"
+CONFIG_WPS_MODEL_NUMBER="1.0"
+CONFIG_WPS_MODEL_NAME="Prototype"
+CONFIG_WPS_DEVICE_NAME="AGV Remote Control"
+# end of AGV WPS settings
 # end of Component config
 
 #
