@@ -132,12 +132,6 @@ void WiFiManager::wiFiEventHandler(__unused esp_event_base_t eventBase,
                 //TODO: ESP-IDF v4.1 doesn't support multiple WPS credentials (fix present in master but not included to release).
                 //      Need to implement it later. See: https://github.com/espressif/esp-idf/commit/81f037a2999992fbe184b4b8871a4c670d8fd804
 
-                //TODO: remove later
-                wifi_config_t config;
-                ESP_ERROR_CHECK(esp_wifi_get_config(ESP_IF_WIFI_STA, &config));
-                ESP_LOGV(LOG_TAG, "SSID: %s", config.sta.ssid);
-                ESP_LOGV(LOG_TAG, "Password: %s", config.sta.password);
-
                 /*
                  * If only one AP credential is received from WPS, there will be no event data and
                  * esp_wifi_set_config() is already called by WPS modules for backward compatibility
