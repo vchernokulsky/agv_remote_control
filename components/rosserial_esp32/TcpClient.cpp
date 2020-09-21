@@ -12,11 +12,14 @@
 TcpClient::TcpClient(uint32_t address, uint16_t port)
     : address(address),
       port(port) {
+    ESP_LOGV(LOG_TAG, "Initialize TCP client");
 }
 
 bool TcpClient::connect() {
+    ESP_LOGV(LOG_TAG, "Connect");
+
     if (socketHandle >= 0) { // already connected
-        ESP_LOGW(LogTag, "Successfully connected already");
+        ESP_LOGW(LOG_TAG, "Successfully connected already");
         return true;
     }
 
@@ -27,15 +30,15 @@ bool TcpClient::connect() {
 
     socketHandle = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
     if (socketHandle < 0) {
-        ESP_LOGE(LogTag, "Unable to create socket: errno %s (%d)", std::strerror(errno), errno);
+        ESP_LOGE(LOG_TAG, "Unable to create socket: errno %s (%d)", std::strerror(errno), errno);
         return false;
     }
 
-    ESP_LOGI(LogTag, "Socket created, connecting to %s:%d", inet_ntoa(address), port); // inet_ntoa using global buffer
+    ESP_LOGD(LOG_TAG, "Socket created, connecting to %s:%d", inet_ntoa(address), port); // inet_ntoa using global buffer
 
     int fcntlResult = fcntl(socketHandle, F_SETFL, O_NONBLOCK);
     if (fcntlResult < 0) {
-        ESP_LOGE(LogTag, "Unable to configure socket: errno %s (%d)", std::strerror(errno), errno);
+        ESP_LOGE(LOG_TAG, "Unable to configure socket: errno %s (%d)", std::strerror(errno), errno);
 
         disconnect();
         return false;
@@ -49,20 +52,22 @@ bool TcpClient::connect() {
                 return false;
             }
         } else {
-            ESP_LOGE(LogTag, "Socket unable to connect: errno %s (%d)", std::strerror(errno), errno);
+            ESP_LOGE(LOG_TAG, "Socket unable to connect: errno %s (%d)", std::strerror(errno), errno);
 
             disconnect();
             return false;
         }
     }
 
-    ESP_LOGI(LogTag, "Successfully connected");
+    ESP_LOGD(LOG_TAG, "Successfully connected");
     return true;
 }
 
 bool TcpClient::disconnect() {
+    ESP_LOGV(LOG_TAG, "Disconnect");
+
     if (socketHandle < 0) { // already disconnected
-        ESP_LOGW(LogTag, "Successfully disconnected already");
+        ESP_LOGW(LOG_TAG, "Successfully disconnected already");
         return true;
     }
 
@@ -71,20 +76,20 @@ bool TcpClient::disconnect() {
         if (errno == ENOTCONN) {
             // Do Nothing (if `Socket is not connected` then just close socket)
         } else {
-            ESP_LOGE(LogTag, "Unable to shutdown socket: errno %s (%d)", std::strerror(errno), errno);
+            ESP_LOGE(LOG_TAG, "Unable to shutdown socket: errno %s (%d)", std::strerror(errno), errno);
             return false;
         }
     }
 
     int closeResult = close(socketHandle);
     if (closeResult < 0) {
-        ESP_LOGE(LogTag, "Unable to close socket: errno %s (%d)", std::strerror(errno), errno);
+        ESP_LOGE(LOG_TAG, "Unable to close socket: errno %s (%d)", std::strerror(errno), errno);
         return false;
     }
 
     socketHandle = -1;
 
-    ESP_LOGI(LogTag, "Successfully disconnected");
+    ESP_LOGD(LOG_TAG, "Successfully disconnected");
     return true;
 }
 
@@ -101,7 +106,7 @@ bool TcpClient::read(uint8_t &data) {
             return false;
         }
 
-        ESP_LOGE(LogTag, "Unable to read from socket: errno %s (%d)", std::strerror(errno), errno);
+        ESP_LOGE(LOG_TAG, "Unable to read from socket: errno %s (%d)", std::strerror(errno), errno);
 
         disconnect();
 
@@ -121,7 +126,7 @@ bool TcpClient::write(uint8_t *data, int length) {
 
     int sendResult = send(socketHandle, data, length, 0);
     if (sendResult < 0) {
-        ESP_LOGE(LogTag, "Unable to write to socket: errno %s (%d)", std::strerror(errno), errno);
+        ESP_LOGE(LOG_TAG, "Unable to write to socket: errno %s (%d)", std::strerror(errno), errno);
 
         disconnect();
 
@@ -144,7 +149,7 @@ bool TcpClient::waitConnection() {
 
     int selectResult = select(FD_SETSIZE, nullptr, &set, nullptr, &timeout);
     if (selectResult < 0) {
-        ESP_LOGE(LogTag, "Unable to wait to connect: errno %s (%d)", std::strerror(errno), errno);
+        ESP_LOGE(LOG_TAG, "Unable to wait to connect: errno %s (%d)", std::strerror(errno), errno);
         return false;
     }
 

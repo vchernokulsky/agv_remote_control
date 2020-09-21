@@ -50,7 +50,7 @@ public:
 private:
     void initializeConnectionToRos();
 
-    bool joystickFlow();
+    bool navigationLoop();
 
     bool convertJoystickPosition(uint32_t xValue, uint32_t yValue, double &linearSpeed, double &angularSpeed);
     bool sendNavigationMessage(double linearSpeed, double angularSpeed);

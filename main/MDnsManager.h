@@ -11,6 +11,9 @@
 #include <lwip/ip4_addr.h>
 
 class MDnsManager {
+private:
+    const char *LOG_TAG = "MDnsManager";
+
     const uint32_t LOOKUP_TIMEOUT = 3000; // ms
 public:
     const std::string ROS_MASTER_INSTANCE_NAME = "ROS Master";

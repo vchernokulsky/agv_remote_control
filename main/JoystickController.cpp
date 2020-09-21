@@ -11,6 +11,8 @@
 #include <esp_adc_cal.h>
 
 void JoystickController::initializeADCDriver() {
+    ESP_LOGV(LOG_TAG, "Initialize ADC driver");
+
     ESP_LOGV(LOG_TAG, "ADC Two Point Calibration: %s",
              esp_adc_cal_check_efuse(ESP_ADC_CAL_VAL_EFUSE_TP) == ESP_OK ? "Supported" : "Not Supported");
     ESP_LOGV(LOG_TAG, "ADC VRef Calibration: %s",
@@ -22,6 +24,8 @@ void JoystickController::initializeADCDriver() {
 }
 
 bool JoystickController::calibrateCenter(uint32_t &xCenter, uint32_t &yCenter) {
+    ESP_LOGV(LOG_TAG, "Calibrate joystick center");
+
     uint32_t x = 0;
     uint32_t y = 0;
 
@@ -43,7 +47,7 @@ bool JoystickController::calibrateCenter(uint32_t &xCenter, uint32_t &yCenter) {
     xCenter = x / NumberOfMeasurements;
     yCenter = y / NumberOfMeasurements;
 
-    ESP_LOGD(LOG_TAG, "Calibrated Joystick Center: (%u, %u)", xCenter, yCenter);
+    ESP_LOGD(LOG_TAG, "Calibrated joystick center: (%u, %u)", xCenter, yCenter);
 
     return true;
 }

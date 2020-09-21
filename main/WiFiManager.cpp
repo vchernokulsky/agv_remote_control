@@ -14,11 +14,15 @@
 #include <esp_supplicant/esp_wps.h>
 
 WiFiManager::WiFiManager() {
+    ESP_LOGV(LOG_TAG, "Initialization of Wi-Fi system");
+
     ESP_ERROR_CHECK(esp_netif_init());
 }
 
 void WiFiManager::start_wifi_client() {
     assert(!isWiFiClientStarted);
+
+    ESP_LOGV(LOG_TAG, "Start STA Wi-Fi client");
 
     ESP_ERROR_CHECK(esp_event_loop_create_default());
     assert(esp_netif_create_default_wifi_sta());
@@ -37,6 +41,8 @@ void WiFiManager::start_wifi_client() {
 void WiFiManager::stop_wifi_client() {
     assert(isWiFiClientStarted);
 
+    ESP_LOGV(LOG_TAG, "Stop STA Wi-Fi client");
+
     ESP_ERROR_CHECK(esp_wifi_stop());
 
     ESP_ERROR_CHECK(esp_event_handler_unregister(IP_EVENT, IP_EVENT_STA_GOT_IP, &gotIpEventHandlerWrapper));
@@ -50,6 +56,8 @@ void WiFiManager::stop_wifi_client() {
 void WiFiManager::start_wps() {
     assert(isWiFiClientStarted);
 
+    ESP_LOGV(LOG_TAG, "Start Wi-Fi WPS");
+
     wpsConfig = getWpsConfig();
     ESP_ERROR_CHECK(esp_wifi_wps_enable(&wpsConfig));
     ESP_ERROR_CHECK(esp_wifi_wps_start(0));
@@ -58,18 +66,25 @@ void WiFiManager::start_wps() {
 void WiFiManager::stop_wps() {
     assert(isWiFiClientStarted);
 
+    ESP_LOGV(LOG_TAG, "Stop Wi-Fi WPS");
+
     ESP_ERROR_CHECK(esp_wifi_wps_disable());
 }
 
 void WiFiManager::connect() {
     assert(isWiFiClientStarted);
     assert(!isWiFiConnectionEstablished);
+
+    ESP_LOGV(LOG_TAG, "Connect to Wi-Fi (use automatically saved to flash memory credentials)");
+
     ESP_ERROR_CHECK(esp_wifi_connect());
 }
 
 void WiFiManager::connect(const std::string &ssid, const std::string &password) {
     assert(isWiFiClientStarted);
     assert(!isWiFiConnectionEstablished);
+
+    ESP_LOGV(LOG_TAG, "Connect to Wi-Fi with SSID and password");
 
     wifi_config_t wifiConfig = {};
     strlcpy((char *)wifiConfig.sta.ssid, ssid.c_str(), sizeof(wifiConfig.sta.ssid));
@@ -85,6 +100,9 @@ void WiFiManager::connect(const std::string &ssid, const std::string &password) 
 void WiFiManager::disconnect() {
     assert(isWiFiClientStarted);
     assert(isWiFiConnectionEstablished);
+
+    ESP_LOGV(LOG_TAG, "Disconnect from Wi-Fi");
+
     ESP_ERROR_CHECK(esp_wifi_disconnect());
 }
 

@@ -14,6 +14,7 @@ class TaskBase {
 protected:
     std::atomic_bool isCancelled = ATOMIC_VAR_INIT(false);
 
+    std::string taskName;
     TaskHandle_t taskHandle = nullptr;
 
 public:

@@ -9,6 +9,11 @@
 #include <esp_log.h>
 
 void TaskBase::runTask(const std::string &taskName, BaseType_t taskPriority, uint32_t stackDepth) {
+    assert(taskHandle == nullptr);
+
+    ESP_LOGV(taskName.c_str(), "Run task");
+
+    this->taskName = taskName;
     isCancelled = false;
 
     BaseType_t taskResult = xTaskCreate(&taskHandler, taskName.c_str(), stackDepth, this, taskPriority, &taskHandle);
@@ -20,6 +25,10 @@ void TaskBase::runTask(const std::string &taskName, BaseType_t taskPriority, uin
 }
 
 void TaskBase::cancelTask(bool waitCancellation) {
+    assert(taskHandle != nullptr);
+
+    ESP_LOGV(taskName.c_str(), "Cancel task");
+
     isCancelled = true;
 
     if (waitCancellation) {

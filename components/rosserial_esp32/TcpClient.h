@@ -11,7 +11,7 @@
 
 class TcpClient {
 private:
-    const char* LogTag = "TcpClient";
+    const char *LOG_TAG = "TcpClient";
 
     const time_t ConnectionTimeout = 3; // sec
 

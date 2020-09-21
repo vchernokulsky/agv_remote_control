@@ -5,11 +5,14 @@
 #include "Esp32Hardware.h"
 
 
+#include <esp_log.h>
 #include <cassert>
 #include <esp_timer.h>
 
 Esp32Hardware::~Esp32Hardware() {
     assert(tcpClient != nullptr);
+
+    ESP_LOGV(LOG_TAG, "De-initialization");
 
     if(!tcpClient->disconnect()) {
         // Do Nothing
@@ -22,6 +25,8 @@ Esp32Hardware::~Esp32Hardware() {
 
 void Esp32Hardware::init(uint32_t rosMasterAddress, uint16_t rosMasterPort) {
     assert(tcpClient == nullptr); // hardware must be initialized only once
+
+    ESP_LOGV(LOG_TAG, "Initialization");
 
     tcpClient = new TcpClient(rosMasterAddress, rosMasterPort);
     if (!tcpClient->connect()) {

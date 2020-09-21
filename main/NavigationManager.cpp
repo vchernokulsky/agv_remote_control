@@ -17,6 +17,8 @@ NavigationManager::NavigationManager(uint32_t rosMasterAddress, uint16_t rosMast
 }
 
 void NavigationManager::initializeConnectionToRos() {
+    ESP_LOGV(LOG_TAG, "Initialize connection to ROS");
+
     nodeHandle.initNode(rosMasterAddress, rosMasterPort);
     while (!nodeHandle.connected()) {
         ESP_LOGD(LOG_TAG, "Wait connection to ROS Master...");
@@ -38,7 +40,7 @@ void NavigationManager::initializeConnectionToRos() {
     }
 }
 
-bool NavigationManager::joystickFlow() {
+bool NavigationManager::navigationLoop() {
     uint32_t xValue, yValue;
     if (!joystickController.collectPosition(xValue, yValue)) {
         ESP_LOGE(LOG_TAG, "Can't collect joystick position");
@@ -88,14 +90,18 @@ bool NavigationManager::sendNavigationMessage(double linearSpeed, double angular
 }
 
 void NavigationManager::task() {
+    ESP_LOGV(LOG_TAG, "Start navigation loop");
+
     TickType_t xLastWakeTime = xTaskGetTickCount();
     while(!isCancelled) {
-        TickType_t delay = joystickFlow() ? MEASUREMENT_INTERVAL : 5000;
+        TickType_t delay = navigationLoop() ? MEASUREMENT_INTERVAL : 5000;
 
         nodeHandle.spinOnce(); //TODO: implement error handling?
 
         vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(delay));
     }
+
+    ESP_LOGV(LOG_TAG, "Finish navigation loop");
 }
 
 bool NavigationManager::readParam(const std::string &paramName, double &value) {
