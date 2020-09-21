@@ -35,8 +35,8 @@ void NavigationManager::initializeConnectionToRos() {
         ESP_LOGW(LOG_TAG, "Use default %s param value: %f", MAX_ANGULAR_SPEED_PARAM.c_str(), MaxAngularSpeed);
 
     if(!nodeHandle.advertise(publisher)) {
-        ESP_LOGE(LOG_TAG, "Can't advertise navigation publisher");
-        //TODO: reconnect?
+        ESP_LOGE(LOG_TAG, "Can't advertise navigation publisher. Achieved MAX_PUBLISHERS limit.");
+        abort();
     }
 }
 
