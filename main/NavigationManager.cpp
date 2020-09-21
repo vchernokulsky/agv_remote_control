@@ -23,7 +23,7 @@ void NavigationManager::initializeConnectionToRos() {
     while (!nodeHandle.connected()) {
         ESP_LOGD(LOG_TAG, "Wait connection to ROS Master...");
 
-        nodeHandle.spinOnce(); //TODO: implement error handling?
+        nodeHandle.spinOnce(); //FYI: Ignore useless errors
 
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
@@ -96,7 +96,7 @@ void NavigationManager::task() {
     while(!isCancelled) {
         TickType_t delay = navigationLoop() ? MEASUREMENT_INTERVAL : 5000;
 
-        nodeHandle.spinOnce(); //TODO: implement error handling?
+        nodeHandle.spinOnce(); //FYI: Ignore useless errors
 
         vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(delay));
     }
