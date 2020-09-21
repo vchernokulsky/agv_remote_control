@@ -29,8 +29,8 @@ private:
 
     const std::string TOPIC_NAME = "/turtle1/cmd_vel";
 
-    double MaxLinearSpeed = 1; // m/sec
-    double MaxAngularSpeed = M_PI_2; // rad/sec
+    double MaxLinearSpeed = 1; // m/sec (initiated by default value)
+    double MaxAngularSpeed = M_PI_2; // rad/sec (initiated by default value)
 
     uint32_t rosMasterAddress;
     uint16_t rosMasterPort;
