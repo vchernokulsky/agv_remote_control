@@ -10,6 +10,7 @@
 
 #include <cstdint>
 #include <cmath>
+#include <string>
 #include <freertos/FreeRTOS.h>
 #include <freertos/queue.h>
 #include <ros.h>
@@ -19,14 +20,14 @@
 
 class NavigationManager: public TaskBase {
 private:
-    const char* LOG_TAG = "NavigationManager";
+    const char *LOG_TAG = "NavigationManager";
 
     const uint32_t MEASUREMENT_INTERVAL = 10; // ms
 
-    const char *MAX_LINEAR_SPEED_PARAM = "/agv_remote_control/max_linear_speed";
-    const char *MAX_ANGULAR_SPEED_PARAM = "/agv_remote_control/max_angular_speed";
+    const std::string MAX_LINEAR_SPEED_PARAM = "/agv_remote_control/max_linear_speed";
+    const std::string MAX_ANGULAR_SPEED_PARAM = "/agv_remote_control/max_angular_speed";
 
-    const char* TOPIC_NAME = "/turtle1/cmd_vel";
+    const std::string TOPIC_NAME = "/turtle1/cmd_vel";
 
     double MaxLinearSpeed = 1; // m/sec
     double MaxAngularSpeed = M_PI_2; // rad/sec
@@ -56,7 +57,7 @@ private:
 
     void task() override;
 
-    bool readParam(const char *paramName, double &value);
+    bool readParam(const std::string &paramName, double &value);
 };
 
 

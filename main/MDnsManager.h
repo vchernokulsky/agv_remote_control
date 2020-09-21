@@ -13,9 +13,9 @@
 class MDnsManager {
     const uint32_t LOOKUP_TIMEOUT = 3000; // ms
 public:
-    const char *ROS_MASTER_INSTANCE_NAME = "ROS Master";
-    const char *ROS_MASTER_SERVICE_TYPE = "_ros-master";
-    const char *ROS_MASTER_PROTOCOL = "_tcp";
+    const std::string ROS_MASTER_INSTANCE_NAME = "ROS Master";
+    const std::string ROS_MASTER_SERVICE_TYPE = "_ros-master";
+    const std::string ROS_MASTER_PROTOCOL = "_tcp";
 
     MDnsManager();
 

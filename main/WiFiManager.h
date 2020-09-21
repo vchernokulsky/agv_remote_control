@@ -6,9 +6,10 @@
 #define AGV_REMOTE_CONTROL_WIFIMANAGER_H
 
 
+#include <atomic>
+#include <string>
 #include <esp_supplicant/esp_wps.h>
 #include <esp_event_base.h>
-#include <atomic>
 
 class WiFiManager {
 private:
@@ -28,7 +29,7 @@ public:
     void stop_wps();
 
     void connect();
-    void connect(const char *ssid, const char *password);
+    void connect(const std::string &ssid, const std::string &password);
     void disconnect();
 
 private:

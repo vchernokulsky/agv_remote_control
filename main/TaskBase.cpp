@@ -8,13 +8,13 @@
 #include <freertos/task.h>
 #include <esp_log.h>
 
-void TaskBase::runTask(const char *taskName, BaseType_t taskPriority, uint32_t stackDepth) {
+void TaskBase::runTask(const std::string &taskName, BaseType_t taskPriority, uint32_t stackDepth) {
     isCancelled = false;
 
-    BaseType_t taskResult = xTaskCreate(&taskHandler, taskName, stackDepth, this, taskPriority, &taskHandle);
+    BaseType_t taskResult = xTaskCreate(&taskHandler, taskName.c_str(), stackDepth, this, taskPriority, &taskHandle);
 
     if (taskResult != pdPASS) {
-        ESP_LOGE(taskName, "Can't create task handler!");
+        ESP_LOGE(taskName.c_str(), "Can't create task handler!");
         abort();
     }
 }

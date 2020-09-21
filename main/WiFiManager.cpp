@@ -69,13 +69,13 @@ void WiFiManager::connect() {
     ESP_ERROR_CHECK(esp_wifi_connect());
 }
 
-void WiFiManager::connect(const char *ssid, const char *password) {
+void WiFiManager::connect(const std::string &ssid, const std::string &password) {
     assert(isWiFiClientStarted);
     assert(!isWiFiConnectionEstablished);
 
     wifi_config_t wifiConfig = {};
-    strlcpy((char *)wifiConfig.sta.ssid, ssid, sizeof(wifiConfig.sta.ssid));
-    strlcpy((char *)wifiConfig.sta.password, password, sizeof(wifiConfig.sta.password));
+    strlcpy((char *)wifiConfig.sta.ssid, ssid.c_str(), sizeof(wifiConfig.sta.ssid));
+    strlcpy((char *)wifiConfig.sta.password, password.c_str(), sizeof(wifiConfig.sta.password));
     wifiConfig.sta.threshold.authmode = WIFI_AUTH_WPA2_PSK;
     wifiConfig.sta.pmf_cfg.capable = true;
     wifiConfig.sta.pmf_cfg.required = false;

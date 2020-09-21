@@ -8,6 +8,7 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <atomic>
+#include <string>
 
 class TaskBase {
 protected:
@@ -16,7 +17,7 @@ protected:
     TaskHandle_t taskHandle = nullptr;
 
 public:
-    void runTask(const char *taskName, BaseType_t taskPriority, uint32_t stackDepth = configMINIMAL_STACK_SIZE);
+    void runTask(const std::string &taskName, BaseType_t taskPriority, uint32_t stackDepth = configMINIMAL_STACK_SIZE);
     void cancelTask(bool waitCancellation = false);
 
 private:

@@ -11,7 +11,7 @@
 NavigationManager::NavigationManager(uint32_t rosMasterAddress, uint16_t rosMasterPort)
     : rosMasterAddress(rosMasterAddress),
       rosMasterPort(rosMasterPort),
-      publisher(TOPIC_NAME, &twistMsg) {
+      publisher(TOPIC_NAME.c_str(), &twistMsg) {
     joystickController.calibrateCenter(xCenter, yCenter);
     initializeConnectionToRos();
 }
@@ -28,9 +28,9 @@ void NavigationManager::initializeConnectionToRos() {
     ESP_LOGI(LOG_TAG, "Connected to ROS Master");
 
     if (!readParam(MAX_LINEAR_SPEED_PARAM, MaxLinearSpeed))
-        ESP_LOGW(LOG_TAG, "Use default %s param value: %f", MAX_LINEAR_SPEED_PARAM, MaxLinearSpeed);
+        ESP_LOGW(LOG_TAG, "Use default %s param value: %f", MAX_LINEAR_SPEED_PARAM.c_str(), MaxLinearSpeed);
     if (!readParam(MAX_ANGULAR_SPEED_PARAM, MaxAngularSpeed))
-        ESP_LOGW(LOG_TAG, "Use default %s param value: %f", MAX_ANGULAR_SPEED_PARAM, MaxAngularSpeed);
+        ESP_LOGW(LOG_TAG, "Use default %s param value: %f", MAX_ANGULAR_SPEED_PARAM.c_str(), MaxAngularSpeed);
 
     if(!nodeHandle.advertise(publisher)) {
         ESP_LOGE(LOG_TAG, "Can't advertise navigation publisher");
@@ -98,17 +98,17 @@ void NavigationManager::task() {
     }
 }
 
-bool NavigationManager::readParam(const char *paramName, double &value) {
+bool NavigationManager::readParam(const std::string &paramName, double &value) {
     assert(nodeHandle.connected());
 
     float floatValue;
-    if (!nodeHandle.getParam(paramName, &floatValue)) {
-        ESP_LOGW(LOG_TAG, "Can't read %s param", paramName);
+    if (!nodeHandle.getParam(paramName.c_str(), &floatValue)) {
+        ESP_LOGW(LOG_TAG, "Can't read %s param", paramName.c_str());
         return false;
     }
 
     value = (double) floatValue;
 
-    ESP_LOGD(LOG_TAG, "Read %s param: %f", paramName, value);
+    ESP_LOGD(LOG_TAG, "Read %s param: %f", paramName.c_str(), value);
     return true;
 }
