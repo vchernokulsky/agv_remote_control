@@ -24,6 +24,8 @@ private:
 
     void initializeADCDriver();
 public:
+    JoystickController();
+
     bool calibrateCenter(uint32_t &xCenter, uint32_t &yCenter);
     bool collectPosition(uint32_t &xValue, uint32_t &yValue);
 

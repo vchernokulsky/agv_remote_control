@@ -10,6 +10,10 @@
 #include <driver/adc.h>
 #include <esp_adc_cal.h>
 
+JoystickController::JoystickController() {
+    initializeADCDriver();
+}
+
 void JoystickController::initializeADCDriver() {
     ESP_LOGV(LOG_TAG, "Initialize ADC driver");
 
