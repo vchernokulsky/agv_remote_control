@@ -1,5 +1,5 @@
-#include "WiFiManager.h"
-#include "MDnsManager.h"
+#include "network/WiFiManager.h"
+#include "network/MDnsManager.h"
 #include "navigation/NavigationManager.h"
 
 #include <freertos/FreeRTOS.h>
