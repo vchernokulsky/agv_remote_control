@@ -5,7 +5,6 @@
 #ifndef AGV_REMOTE_CONTROL_NAVIGATIONMANAGER_H
 #define AGV_REMOTE_CONTROL_NAVIGATIONMANAGER_H
 
-#include "TaskBase.h"
 #include "JoystickController.h"
 
 #include <cstdint>
@@ -17,6 +16,7 @@
 #include <ros_lib/ros/publisher.h>
 #include <ros_lib/geometry_msgs/Twist.h>
 #include <ros_lib/geometry_msgs/Point.h>
+#include "utils/TaskBase.h"
 
 class NavigationManager: public TaskBase {
 private:
