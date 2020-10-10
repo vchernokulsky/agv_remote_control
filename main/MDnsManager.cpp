@@ -43,7 +43,7 @@ bool MDnsManager::lookupRosMaster(std::string &rosMasterHost, ip4_addr_t &rosMas
 
     esp_ip4_addr_t address;
     esp_err_t aQueryResult = mdns_query_a(rosMasterHost.c_str(), LOOKUP_TIMEOUT, &address);
-    if (aQueryResult != ESP_OK) {// i.e. in case ESP_ERR_NOT_FOUND
+    if (aQueryResult != ESP_OK) { // i.e. in case ESP_ERR_NOT_FOUND
         ESP_LOGV(LOG_TAG, "Can't query A record. Error: %d", aQueryResult);
         return false;
     }
