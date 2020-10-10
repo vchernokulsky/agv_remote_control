@@ -1,6 +1,6 @@
 #include "WiFiManager.h"
 #include "MDnsManager.h"
-#include "NavigationManager.h"
+#include "navigation/NavigationManager.h"
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
