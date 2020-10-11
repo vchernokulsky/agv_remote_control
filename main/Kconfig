@@ -15,8 +15,10 @@ menu "AGV Remote Control"
 
             config AGV_RC_WIFI_SSID
                 string "SSID for authentication"
+                default "???"
             config AGV_RC_WIFI_PASSWORD
                 string "Password for authentication"
+                default "???"
         endmenu
 
         menu "WPS authentication"
