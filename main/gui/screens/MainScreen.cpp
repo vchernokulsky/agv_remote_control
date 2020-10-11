@@ -2,7 +2,6 @@
 // Created by Maxim Dobryakov on 06/10/2020.
 //
 
-#include <esp_log.h>
 #include "MainScreen.h"
 
 #include "assets/Montserrat12Font.h"
@@ -29,8 +28,6 @@ void MainScreen::initializeGui() {
 //    activeScreen = logScreen->screen;
 
     lv_scr_load(activeScreen);
-
-    timerTaskHandle = lv_task_create(timerTaskHandler, 9000, LV_TASK_PRIO_MID, this);
 }
 
 void MainScreen::deinitializeGui() {
@@ -45,19 +42,4 @@ void MainScreen::initializeRussianFonts() {
     theme->font_normal = &Montserrat14Font;
     theme->font_subtitle = &Montserrat14Font;
     theme->font_title = &Montserrat16Font;
-}
-
-void MainScreen::timerTaskHandler(lv_task_t *task) {
-    auto *instance = static_cast<MainScreen *>(task->user_data);
-    instance->timerTask();
-}
-
-void MainScreen::timerTask() {
-    if (activeScreen == indicatorScreen->screen) {
-        activeScreen = logScreen->screen;
-    } else {
-        activeScreen = indicatorScreen->screen;
-    }
-
-    lv_scr_load(activeScreen);
 }

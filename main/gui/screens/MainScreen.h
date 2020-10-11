@@ -15,12 +15,8 @@ private:
     IndicatorsScreen *indicatorScreen;
     LogScreen *logScreen;
 
-    lv_task_t *timerTaskHandle = nullptr;
-
     lv_obj_t *activeScreen = nullptr;
 
-    static void timerTaskHandler(lv_task_t *task);
-    void timerTask();
 public:
     MainScreen();
     virtual ~MainScreen();
