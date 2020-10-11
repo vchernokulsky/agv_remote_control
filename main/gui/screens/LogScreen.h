@@ -10,14 +10,10 @@
 
 class LogScreen : public ScreenBase {
 private:
-    lv_task_t *timerTaskHandle = nullptr;
-
     lv_obj_t *imgBackground = nullptr;
 
     lv_obj_t *lstLog = nullptr;
 
-    static void timerTaskHandler(lv_task_t *task);
-    void timerTask();
 public:
     lv_obj_t *screen = nullptr;
 
