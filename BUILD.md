@@ -13,9 +13,13 @@
    
    See [Step 3. Set up the tools](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/index.html#id3) for more details.
 
+# Prepare sources
+
+1. Install and update submodules use `git submodule update --init --recursive`
+1. Run `bin/generate_ros_lib.sh` script to generate content of `components/rosserial_esp32/ros_lib` directory.
+
 ## Build from CLion IDE 
 
-1. Run `bin/generate_ros_lib.sh` script to generate content of `components/rosserial_esp32/ros_lib` directory.
 1. Import CMake project use `Open or import` menu item.
 1. Select `app | Debug` configuration to build project or `app-flash | Debug` to build and flash.
 

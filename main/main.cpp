@@ -8,11 +8,16 @@
 #include <esp_wifi.h>
 #include <esp_log.h>
 #include <ros.h>
+#include <gui/LvGlApp.h>
+#include <gui/screens/MainScreen.h>
 
 extern "C" void app_main();
 
 void app_main() {
-    vTaskDelay(pdMS_TO_TICKS(1000));
+    auto *mainScreen = new MainScreen();
+
+    auto *app = new LvGlApp(mainScreen);
+    app->runEventLoop();
 
     WiFiManager wiFiManager;
 
