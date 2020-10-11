@@ -56,7 +56,10 @@ void app_main() {
 
     ESP_LOGI("Main", "ROS Master: " IPSTR ":%d", IP2STR(&rosManagerIp4), rosManagerPort);
 
-    auto *navigationManager = new NavigationManager(rosManagerIp4.addr, rosManagerPort);
+    auto *rosClient = new RosClient(rosManagerIp4.addr, rosManagerPort);
+    rosClient->connect();
+
+    auto *navigationManager = new NavigationManager(rosClient);
     navigationManager->runTask("JoystickManager", 2, 8 * configMINIMAL_STACK_SIZE);
 
 //    ESP_LOGI("Main", "Delay...");

@@ -10,13 +10,8 @@
 #include <cstdint>
 #include <cmath>
 #include <string>
-#include <freertos/FreeRTOS.h>
-#include <freertos/queue.h>
-#include <ros.h>
-#include <ros_lib/ros/publisher.h>
-#include <ros_lib/geometry_msgs/Twist.h>
-#include <ros_lib/geometry_msgs/Point.h>
 #include "utils/TaskBase.h"
+#include "ros/RosClient.h"
 
 class NavigationManager: public TaskBase {
 private:
@@ -24,40 +19,22 @@ private:
 
     const uint32_t MEASUREMENT_INTERVAL = 10; // ms
 
-    const std::string MAX_LINEAR_SPEED_PARAM = "/agv_remote_control/max_linear_speed";
-    const std::string MAX_ANGULAR_SPEED_PARAM = "/agv_remote_control/max_angular_speed";
-
-    const std::string TOPIC_NAME = "/turtle1/cmd_vel";
-
-    double MaxLinearSpeed = 1; // m/sec (initiated by default value)
-    double MaxAngularSpeed = M_PI_2; // rad/sec (initiated by default value)
-
-    uint32_t rosMasterAddress;
-    uint16_t rosMasterPort;
+    RosClient *rosClient;
 
     JoystickController joystickController;
 
     uint32_t xCenter = 0;
     uint32_t yCenter = 0;
 
-    ros::NodeHandle nodeHandle;
-    ros::Publisher publisher;
-    geometry_msgs::Twist twistMsg;
-
 public:
-    NavigationManager(uint32_t rosMasterAddress, uint16_t rosMasterPort);
+    explicit NavigationManager(RosClient *rosClient);
 
 private:
-    void initializeConnectionToRos();
-
     bool navigationLoop();
 
     bool convertJoystickPosition(uint32_t xValue, uint32_t yValue, double &linearSpeed, double &angularSpeed);
-    bool sendNavigationMessage(double linearSpeed, double angularSpeed);
 
     void task() override;
-
-    bool readParam(const std::string &paramName, double &value);
 };
 
 

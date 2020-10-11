@@ -12,6 +12,8 @@
 
 class NodeHandle: public ros::NodeHandle_<Esp32Hardware> {
 public:
+    virtual ~NodeHandle() = default;
+
     void initNode(uint32_t rosMasterAddress, uint16_t rosMasterPort);
 };
 
