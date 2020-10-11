@@ -60,7 +60,7 @@ void app_main() {
     rosClient->connect();
 
     auto *navigationManager = new NavigationManager(rosClient);
-    navigationManager->runTask("JoystickManager", 2, 8 * configMINIMAL_STACK_SIZE);
+    navigationManager->start();
 
 //    ESP_LOGI("Main", "Delay...");
 //    vTaskDelay(pdMS_TO_TICKS(20000));

@@ -14,6 +14,14 @@ NavigationManager::NavigationManager(RosClient *rosClient) :
     joystickController.calibrateCenter(xCenter, yCenter);
 }
 
+void NavigationManager::start() {
+    runTask("joystick-manager", 2, 8 * configMINIMAL_STACK_SIZE);
+}
+
+void NavigationManager::stop(bool waitCancellation) {
+    cancelTask(waitCancellation);
+}
+
 bool NavigationManager::navigationLoop() {
     uint32_t xValue, yValue;
     if (!joystickController.collectPosition(xValue, yValue)) {

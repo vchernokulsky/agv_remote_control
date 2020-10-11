@@ -17,14 +17,13 @@ protected:
     std::string taskName;
     TaskHandle_t taskHandle = nullptr;
 
-public:
-    void runTask(const std::string &taskName, BaseType_t taskPriority, uint32_t stackDepth = configMINIMAL_STACK_SIZE);
-    void cancelTask(bool waitCancellation = false);
-
 private:
     static void taskHandler(void* parm);
 
 protected:
+    void runTask(const std::string &taskName, BaseType_t taskPriority, uint32_t stackDepth = configMINIMAL_STACK_SIZE);
+    void cancelTask(bool waitCancellation = false);
+
     virtual void task() = 0;
 };
 

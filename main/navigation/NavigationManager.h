@@ -29,6 +29,9 @@ private:
 public:
     explicit NavigationManager(RosClient *rosClient);
 
+    void start();
+    void stop(bool waitCancellation = false);
+
 private:
     bool navigationLoop();
 
