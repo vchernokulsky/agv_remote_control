@@ -201,10 +201,10 @@ esp_wps_config_t WiFiManager::getWpsConfig() {
 
     espWpsConfig.wps_type = WPS_TYPE_PBC;
 
-    strlcpy(espWpsConfig.factory_info.manufacturer, CONFIG_WPS_MANUFACTURER, sizeof(espWpsConfig.factory_info.manufacturer));
-    strlcpy(espWpsConfig.factory_info.model_number, CONFIG_WPS_MODEL_NUMBER, sizeof(espWpsConfig.factory_info.model_number));
-    strlcpy(espWpsConfig.factory_info.model_name, CONFIG_WPS_MODEL_NAME, sizeof(espWpsConfig.factory_info.model_name));
-    strlcpy(espWpsConfig.factory_info.device_name, CONFIG_WPS_DEVICE_NAME, sizeof(espWpsConfig.factory_info.device_name));
+    strlcpy(espWpsConfig.factory_info.manufacturer, CONFIG_AGV_RC_WPS_MANUFACTURER, sizeof(espWpsConfig.factory_info.manufacturer));
+    strlcpy(espWpsConfig.factory_info.model_number, CONFIG_AGV_RC_WPS_MODEL_NUMBER, sizeof(espWpsConfig.factory_info.model_number));
+    strlcpy(espWpsConfig.factory_info.model_name, CONFIG_AGV_RC_WPS_MODEL_NAME, sizeof(espWpsConfig.factory_info.model_name));
+    strlcpy(espWpsConfig.factory_info.device_name, CONFIG_AGV_RC_WPS_DEVICE_NAME, sizeof(espWpsConfig.factory_info.device_name));
 
     return espWpsConfig;
 }

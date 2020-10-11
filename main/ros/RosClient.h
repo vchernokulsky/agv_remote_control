@@ -38,6 +38,7 @@ private:
 
 public:
     RosClient(uint32_t rosMasterAddress, uint16_t rosMasterPort);
+    virtual ~RosClient() = default;
 
     void connect();
     void disconnect();

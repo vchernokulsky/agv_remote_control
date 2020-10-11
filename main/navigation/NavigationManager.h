@@ -28,6 +28,7 @@ private:
 
 public:
     explicit NavigationManager(RosClient *rosClient);
+    virtual ~NavigationManager() = default;
 
     void start();
     void stop(bool waitCancellation = false);

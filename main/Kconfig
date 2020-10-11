@@ -1,17 +1,42 @@
-menu "AGV WPS settings"
-    config WPS_MANUFACTURER
-        string "Manufacturer of RC device."
-        default "IntemsLab"
+menu "AGV Remote Control"
+    menu "Wi-Fi Settings"
+        choice AGV_RC_WIFI_AUTHENTICATION
+            prompt "Wi-Fi authentication"
+            default AGV_RC_WIFI_PASSWORD_AUTHENTICATION
 
-    config WPS_MODEL_NUMBER
-        string "Model number (version) of RC device."
-        default "1.0"
+            config AGV_RC_WIFI_PASSWORD_AUTHENTICATION
+                bool "Password authentication"
+            config AGV_RC_WIFI_WPS_AUTHENTICATION
+                bool "WPS authentication"
+        endchoice
 
-    config WPS_MODEL_NAME
-        string "Model name (name of version) of RC device."
-        default "Prototype"
+        menu "Password authentication"
+            visible if AGV_RC_WIFI_PASSWORD_AUTHENTICATION
 
-    config WPS_DEVICE_NAME
-        string "Device name."
-        default "AGV Remote Control"
+            config AGV_RC_WIFI_SSID
+                string "SSID for authentication"
+            config AGV_RC_WIFI_PASSWORD
+                string "Password for authentication"
+        endmenu
+
+        menu "WPS authentication"
+            visible if AGV_RC_WIFI_WPS_AUTHENTICATION
+
+            config AGV_RC_WPS_MANUFACTURER
+                string "Manufacturer of RC device."
+                default "IntemsLab"
+
+            config AGV_RC_WPS_MODEL_NUMBER
+                string "Model number (version) of RC device."
+                default "1.0"
+
+            config AGV_RC_WPS_MODEL_NAME
+                string "Model name (name of version) of RC device."
+                default "Prototype"
+
+            config AGV_RC_WPS_DEVICE_NAME
+                string "Device name."
+                default "AGV Remote Control"
+        endmenu
+    endmenu
 endmenu
