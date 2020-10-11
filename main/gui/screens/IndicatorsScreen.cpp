@@ -99,13 +99,9 @@ void IndicatorsScreen::initializeGui() {
 
     lblPlatformStatus = lv_label_create(cntPlatformStatus, nullptr);
     lv_label_set_text_fmt(lblPlatformStatus, "СТАТУС: %s", "OK");
-
-    timerTaskHandle = lv_task_create(timerTaskHandler, 3000, LV_TASK_PRIO_MID, this);
 }
 
 void IndicatorsScreen::deinitializeGui() {
-    lv_task_del(timerTaskHandle);
-
     lv_obj_del(imgBackground);
 
     lv_obj_del(lblPlatformName);
@@ -128,35 +124,7 @@ void IndicatorsScreen::deinitializeGui() {
     lv_obj_del(lblPlatformStatus);
 }
 
-void IndicatorsScreen::timerTaskHandler(lv_task_t *task) {
-    auto *instance = static_cast<IndicatorsScreen *>(task->user_data);
-    instance->timerTask();
-}
-
-float rand(float min, float max) {
-    float scale = (float)rand() / (float) RAND_MAX;
-    return min + scale * (max - min);
-}
-
-void IndicatorsScreen::timerTask() {
-    float linearSpeed = rand(MIN_LINEAR_SPEED, MAX_LINEAR_SPEED);
-    updateLinearSpeed(linearSpeed);
-
-    float angularSpeed = rand(MIN_ANGULAR_SPEED, MAX_ANGULAR_SPEED);
-    updateAngularSpeed(angularSpeed);
-
-    float x = rand(0, 200);
-    float y = rand(0, 200);
-    updatePosition(x, y);
-
-    updateWiFiStatus(WiFiStatus(rand() % (int)WiFiStatus::Strange4));
-
-    updateBatteryStatus(BatteryStatus(rand() % (int)BatteryStatus::ChargingPercent100));
-
-    updatePlatformStatus(PlatformStatus(rand() % (int)PlatformStatus::FAULT));
-}
-
-void IndicatorsScreen::LinearSpeedFormatterCallback(lv_obj_t *gauge, char *buf, int bufSize, int32_t value) {
+void IndicatorsScreen::LinearSpeedFormatterCallback(__unused lv_obj_t *gauge, char *buf, int bufSize, int32_t value) {
     int pos = lv_snprintf(buf, bufSize, "%.2f", mapInt16ToFloat(value, -100, 100, MIN_LINEAR_SPEED, MAX_LINEAR_SPEED));
 
     // Remove trailing 0 and . (i.e. 1.00 -> 1)

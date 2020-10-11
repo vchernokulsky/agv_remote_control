@@ -25,8 +25,6 @@ private:
     const float MIN_ANGULAR_SPEED = -M_PI_2;
     const float MAX_ANGULAR_SPEED = M_PI_2;
 
-    lv_task_t *timerTaskHandle = nullptr;
-
     lv_obj_t *imgBackground = nullptr;
 
     lv_obj_t *lblPlatformName = nullptr;
@@ -49,10 +47,7 @@ private:
     lv_obj_t *cntPlatformStatus = nullptr;
     lv_obj_t *lblPlatformStatus = nullptr;
 
-    static void timerTaskHandler(lv_task_t *task);
-    void timerTask();
-
-    static void LinearSpeedFormatterCallback(lv_obj_t *gauge, char *buf, int bufSize, int32_t value);
+    static void LinearSpeedFormatterCallback(__unused lv_obj_t *gauge, char *buf, int bufSize, int32_t value);
 public:
     lv_obj_t *screen = nullptr;
 
