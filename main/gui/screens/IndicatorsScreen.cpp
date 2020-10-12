@@ -13,6 +13,8 @@
 
 using namespace std;
 
+const std::string IndicatorsScreen::PLATFORM_NOT_CONNECTED = "Платформа не подключена";
+
 IndicatorsScreen::IndicatorsScreen(SemaphoreHandle_t guiSemaphore) :
         ScreenBase(guiSemaphore),
         NEEDLE_COLORS{ lv_color_make(255, 0, 0) }
@@ -26,7 +28,7 @@ void IndicatorsScreen::initializeGui() {
     lv_img_set_src(imgBackground, &Background);
 
     lblPlatformName = lv_label_create(screen, nullptr);
-    lv_label_set_text(lblPlatformName, "Платформа №42");
+    lv_label_set_text(lblPlatformName, PLATFORM_NOT_CONNECTED.c_str());
     lv_label_set_long_mode(lblPlatformName, LV_LABEL_LONG_SROLL_CIRC);
     lv_obj_set_size(lblPlatformName, 180, 20);
     lv_obj_align(lblPlatformName, nullptr, LV_ALIGN_IN_TOP_LEFT, 5, 5);
@@ -125,7 +127,7 @@ void IndicatorsScreen::deinitializeGui() {
     lv_obj_del(lblPlatformStatus);
 }
 
-void IndicatorsScreen::LinearSpeedFormatterCallback(__unused lv_obj_t *gauge, char *buf, int bufSize, int32_t value) {
+void IndicatorsScreen::LinearSpeedFormatterCallback(lv_obj_t *gauge, char *buf, int bufSize, int32_t value) {
     int pos = lv_snprintf(buf, bufSize, "%.2f", mapInt16ToFloat(value, -100, 100, MIN_LINEAR_SPEED, MAX_LINEAR_SPEED));
 
     // Remove trailing 0 and . (i.e. 1.00 -> 1)
@@ -136,6 +138,27 @@ void IndicatorsScreen::LinearSpeedFormatterCallback(__unused lv_obj_t *gauge, ch
             pos--;
         buf[pos] = '\0';
     }
+}
+
+void IndicatorsScreen::updatePlatformName(const std::string& platformName) {
+    beginUpdate();
+    lv_label_set_text(lblPlatformName, platformName.c_str());
+    lv_obj_realign(lblPlatformName);
+    endUpdate();
+}
+
+void IndicatorsScreen::updateWiFiStatus(WiFiStatus status) {
+    beginUpdate();
+    lv_label_set_text(lblWiFiStatus, wiFiStatusSymbol(status));
+    lv_obj_realign(lblWiFiStatus);
+    endUpdate();
+}
+
+void IndicatorsScreen::updateBatteryStatus(BatteryStatus status) {
+    beginUpdate();
+    lv_label_set_text(lblBatteryStatus, batteryStatusSymbol(status));
+    lv_obj_realign(lblBatteryStatus);
+    endUpdate();
 }
 
 void IndicatorsScreen::updateLinearSpeed(float linearSpeed) {
@@ -165,20 +188,6 @@ void IndicatorsScreen::updatePosition(float x, float y) {
 
     lv_label_set_text_fmt(lblYValue, "%6.2f м", y);
     lv_obj_realign(lblYValue);
-    endUpdate();
-}
-
-void IndicatorsScreen::updateWiFiStatus(WiFiStatus status) {
-    beginUpdate();
-    lv_label_set_text(lblWiFiStatus, wiFiStatusSymbol(status));
-    lv_obj_realign(lblWiFiStatus);
-    endUpdate();
-}
-
-void IndicatorsScreen::updateBatteryStatus(BatteryStatus status) {
-    beginUpdate();
-    lv_label_set_text(lblBatteryStatus, batteryStatusSymbol(status));
-    lv_obj_realign(lblBatteryStatus);
     endUpdate();
 }
 

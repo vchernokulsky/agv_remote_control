@@ -8,6 +8,7 @@
 #include <cstring>
 #include <esp_log.h>
 #include <lwip/sockets.h>
+#include <esp_netif.h>
 
 TcpClient::TcpClient(uint32_t address, uint16_t port)
     : address(address),
@@ -36,9 +37,17 @@ bool TcpClient::connect() {
 
     ESP_LOGD(LOG_TAG, "Socket created, connecting to %s:%d", inet_ntoa(address), port); // inet_ntoa using global buffer
 
-    int fcntlResult = fcntl(socketHandle, F_SETFL, O_NONBLOCK);
+    int fcntlResult = fcntl(socketHandle, F_GETFL);
     if (fcntlResult < 0) {
-        ESP_LOGE(LOG_TAG, "Unable to configure socket: errno %s (%d)", std::strerror(errno), errno);
+        ESP_LOGE(LOG_TAG, "Unable to get socket flags: errno %s (%d)", std::strerror(errno), errno);
+
+        disconnect();
+        return false;
+    }
+    fcntlResult = fcntlResult | O_NONBLOCK;
+    fcntlResult = fcntl(socketHandle, F_SETFL, fcntlResult);
+    if (fcntlResult < 0) {
+        ESP_LOGE(LOG_TAG, "Unable to set socket flags: errno %s (%d)", std::strerror(errno), errno);
 
         disconnect();
         return false;
@@ -60,6 +69,9 @@ bool TcpClient::connect() {
     }
 
     ESP_LOGD(LOG_TAG, "Successfully connected");
+
+    fireOnConnect();
+
     return true;
 }
 
@@ -71,10 +83,14 @@ bool TcpClient::disconnect() {
         return true;
     }
 
+    bool wasConnected = true;
+
     int shutdownResult = shutdown(socketHandle, SHUT_RDWR);
     if (shutdownResult < 0) {
         if (errno == ENOTCONN) {
-            // Do Nothing (if `Socket is not connected` then just close socket)
+            // If `Socket is not connected` then it's ok and just close socket
+
+            wasConnected = false;
         } else {
             ESP_LOGE(LOG_TAG, "Unable to shutdown socket: errno %s (%d)", std::strerror(errno), errno);
             return false;
@@ -90,6 +106,11 @@ bool TcpClient::disconnect() {
     socketHandle = -1;
 
     ESP_LOGD(LOG_TAG, "Successfully disconnected");
+
+    if (wasConnected) {
+        fireOnDisconnect();
+    }
+
     return true;
 }
 
@@ -141,17 +162,46 @@ bool TcpClient::write(uint8_t *data, int length) {
 bool TcpClient::waitConnection() {
     assert(socketHandle >= 0); // socket required
 
-    fd_set set;
-    FD_ZERO(&set);
-    FD_SET(socketHandle, &set);
+    fd_set rSet;
+    FD_ZERO(&rSet);
+    FD_SET(socketHandle, &rSet);
+
+    fd_set wSet;
+    FD_ZERO(&wSet);
+    FD_SET(socketHandle, &wSet);
 
     struct timeval timeout = { .tv_sec = ConnectionTimeout, .tv_usec = 0 };
 
-    int selectResult = select(FD_SETSIZE, nullptr, &set, nullptr, &timeout);
-    if (selectResult < 0) {
-        ESP_LOGE(LOG_TAG, "Unable to wait to connect: errno %s (%d)", std::strerror(errno), errno);
+    int selectResult = select(FD_SETSIZE, &rSet, &wSet, nullptr, &timeout);
+    if (selectResult <= 0) {
+        ESP_LOGE(LOG_TAG, "Unable to wait to connection: errno %s (%d)", std::strerror(errno), errno);
         return false;
     }
 
-    return true;
+    // Because `select` return 1 (success) even the connection is not established need to add
+    // additional check of connection as recommended here: http://cr.yp.to/docs/connect.html
+    //
+    // FYI: The check with `getsockopt` described in `UNIX Network Programming. Volume 1` book at
+    // `16.4 Nonblocking connect: Daytime Client` section will works the same as check with `getpeername`.
+    struct sockaddr_in socketAddress{};
+    socklen_t socketAddressLength = sizeof(socketAddress);
+    int getPeerNameResult = getpeername(socketHandle, (struct sockaddr *)&socketAddress, &socketAddressLength);
+    if (getPeerNameResult != 0) {
+        ESP_LOGV(LOG_TAG, "Unable to get information about remote server: errno %s (%d)", std::strerror(errno), errno);
+        return false;
+    } else {
+        esp_ip4_addr addr { .addr = socketAddress.sin_addr.s_addr };
+        ESP_LOGD(LOG_TAG, "Connection established with remote server: " IPSTR ":%d", IP2STR(&addr), socketAddress.sin_port);
+        return true;
+    }
+}
+
+void TcpClient::fireOnConnect() const {
+    if (onConnect != nullptr)
+        onConnect();
+}
+
+void TcpClient::fireOnDisconnect() const {
+    if (onDisconnect != nullptr)
+        onDisconnect();
 }

@@ -7,6 +7,7 @@
 
 
 #include <cstdint>
+#include <functional>
 #include <string>
 #include <ros.h>
 #include <ros_lib/ros/publisher.h>
@@ -20,6 +21,7 @@ private:
 
     const uint32_t LOOP_INTERVAL = 10; // ms
 
+    const std::string PLATFORM_NAME_PARAM = "/agv_remote_control/platform_name";
     const std::string MAX_LINEAR_SPEED_PARAM = "/agv_remote_control/max_linear_speed";
     const std::string MAX_ANGULAR_SPEED_PARAM = "/agv_remote_control/max_angular_speed";
 
@@ -33,6 +35,7 @@ private:
     geometry_msgs::Twist navigationMessage = {};
     ros::Publisher *navigationMessagePublisher = nullptr;
 
+    std::string PlatformName;
     double MaxLinearSpeed = 1; // m/sec (initiated by default value)
     double MaxAngularSpeed = M_PI_2; // rad/sec (initiated by default value)
 
@@ -48,10 +51,17 @@ public:
     double getMaxLinearSpeed() const { return MaxLinearSpeed; }
     double getMaxAngularSpeed() const { return MaxAngularSpeed; }
 
+    std::function<void(const std::string &platformName)> onConnect = nullptr;
+    std::function<void()> onDisconnect = nullptr;
+
 private:
     void task() override;
 
     bool readParam(const std::string &paramName, double &value);
+    bool readParam(const std::string &paramName, std::string &value);
+
+    void fireOnConnect();
+    void fireOnDisconnect();
 };
 
 

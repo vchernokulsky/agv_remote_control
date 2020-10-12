@@ -58,6 +58,8 @@ void Application::start() {
     ESP_LOGI("Main", "ROS Master: " IPSTR ":%d", IP2STR(&rosManagerIp4), rosManagerPort);
 
     rosClient = new RosClient(rosManagerIp4.addr, rosManagerPort);
+    rosClient->onConnect = [this](const std::string& platformName) { connectToRosCallback(platformName); };
+    rosClient->onDisconnect = [this]() { disconnectFromRosCallback(); };
     rosClient->connect();
 
     navigationManager = new NavigationManager(rosClient);
@@ -86,9 +88,21 @@ void Application::stop() {
     mainScreen = nullptr;
 }
 
-void Application::wiFiEventCallback(WiFiStatus wiFiStatus, std::string reason) {
+void Application::wiFiEventCallback(WiFiStatus wiFiStatus, const std::string& reason) {
     auto *indicatorScreen = mainScreen->getIndicatorScreen();
 
     indicatorScreen->updateWiFiStatus(wiFiStatus);
     //TODO: write reason to log
+}
+
+void Application::connectToRosCallback(const std::string& platformName) {
+    auto *indicatorScreen = mainScreen->getIndicatorScreen();
+
+    indicatorScreen->updatePlatformName(platformName.empty() ? IndicatorsScreen::PLATFORM_NOT_CONNECTED : platformName);
+}
+
+void Application::disconnectFromRosCallback() {
+    auto *indicatorScreen = mainScreen->getIndicatorScreen();
+
+    indicatorScreen->updatePlatformName(IndicatorsScreen::PLATFORM_NOT_CONNECTED);
 }

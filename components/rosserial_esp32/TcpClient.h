@@ -8,6 +8,7 @@
 
 #include <cstdint>
 #include <ctime>
+#include <functional>
 
 class TcpClient {
 private:
@@ -29,8 +30,14 @@ public:
     bool read(uint8_t &data);
     bool write(uint8_t *data, int length);
 
+    std::function<void()> onConnect = nullptr;
+    std::function<void()> onDisconnect = nullptr;
+
 private:
     bool waitConnection();
+
+    void fireOnConnect() const;
+    void fireOnDisconnect() const;
 };
 
 typedef TcpClient * TcpClient_t;

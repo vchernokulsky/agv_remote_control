@@ -29,6 +29,8 @@ void Esp32Hardware::init(uint32_t rosMasterAddress, uint16_t rosMasterPort) {
     ESP_LOGV(LOG_TAG, "Initialization");
 
     tcpClient = new TcpClient(rosMasterAddress, rosMasterPort);
+    tcpClient->onConnect = onConnect;
+    tcpClient->onDisconnect = onDisconnect;
     if (!tcpClient->connect()) {
         // Do Nothing (will be connected later in read/write methods)
     }

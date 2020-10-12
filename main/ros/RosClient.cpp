@@ -20,6 +20,8 @@ void RosClient::connect() {
     ESP_LOGV(LOG_TAG, "Initialize connection to ROS");
 
     nodeHandle = new NodeHandle();
+    nodeHandle->getHardware()->onConnect = [this]() { fireOnConnect(); };
+    nodeHandle->getHardware()->onDisconnect = [this]() { fireOnDisconnect(); };
     nodeHandle->initNode(rosMasterAddress, rosMasterPort);
     while (!nodeHandle->connected()) {
         ESP_LOGD(LOG_TAG, "Wait connection to ROS Master...");
@@ -30,6 +32,8 @@ void RosClient::connect() {
     }
     ESP_LOGD(LOG_TAG, "Connected to ROS Master");
 
+    if (!readParam(PLATFORM_NAME_PARAM, PlatformName))
+        ESP_LOGW(LOG_TAG, "Use default %s param value: %s", PLATFORM_NAME_PARAM.c_str(), PlatformName.c_str());
     if (!readParam(MAX_LINEAR_SPEED_PARAM, MaxLinearSpeed))
         ESP_LOGW(LOG_TAG, "Use default %s param value: %f", MAX_LINEAR_SPEED_PARAM.c_str(), MaxLinearSpeed);
     if (!readParam(MAX_ANGULAR_SPEED_PARAM, MaxAngularSpeed))
@@ -42,6 +46,8 @@ void RosClient::connect() {
     }
 
     runTask("ros-client-loop", 2, 4 * configMINIMAL_STACK_SIZE);
+
+    fireOnConnect();
 }
 
 void RosClient::disconnect() {
@@ -50,10 +56,12 @@ void RosClient::disconnect() {
     cancelTask(true);
 
     delete nodeHandle;
-    delete navigationMessagePublisher;
-
     nodeHandle = nullptr;
+
+    delete navigationMessagePublisher;
     navigationMessagePublisher = nullptr;
+
+    fireOnDisconnect();
 }
 
 void RosClient::task() {
@@ -90,4 +98,31 @@ bool RosClient::readParam(const std::string &paramName, double &value) {
 
     ESP_LOGD(LOG_TAG, "Read %s param: %f", paramName.c_str(), value);
     return true;
+}
+
+bool RosClient::readParam(const std::string &paramName, std::string &value) {
+    assert(nodeHandle->connected());
+
+    char *stringValue = new char[256];
+    if (!nodeHandle->getParam(paramName.c_str(), &stringValue)) {
+        ESP_LOGW(LOG_TAG, "Can't read %s param", paramName.c_str());
+        delete[] stringValue;
+        return false;
+    }
+
+    value = stringValue;
+    delete[] stringValue;
+
+    ESP_LOGD(LOG_TAG, "Read %s param: %s", paramName.c_str(), value.c_str());
+    return true;
+}
+
+void RosClient::fireOnConnect() {
+    if (onConnect != nullptr)
+        onConnect(PlatformName);
+}
+
+void RosClient::fireOnDisconnect() {
+    if (onDisconnect != nullptr)
+        onDisconnect();
 }

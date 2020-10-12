@@ -9,6 +9,7 @@
 #include "../ScreenBase.h"
 
 #include <cmath>
+#include <string>
 #include "utils/WiFiStatusExt.h"
 #include "utils/BatteryStatus.h"
 #include "utils/PlatformStatus.h"
@@ -47,19 +48,23 @@ private:
     lv_obj_t *cntPlatformStatus = nullptr;
     lv_obj_t *lblPlatformStatus = nullptr;
 
-    static void LinearSpeedFormatterCallback(__unused lv_obj_t *gauge, char *buf, int bufSize, int32_t value);
+    static void LinearSpeedFormatterCallback(lv_obj_t *gauge, char *buf, int bufSize, int32_t value);
+
 public:
+    static const std::string PLATFORM_NOT_CONNECTED;
+
     explicit IndicatorsScreen(SemaphoreHandle_t guiSemaphore);
     virtual ~IndicatorsScreen() = default;
 
     void initializeGui() override;
     void deinitializeGui() override;
 
+    void updatePlatformName(const std::string& platformName);
+    void updateWiFiStatus(WiFiStatus status);
+    void updateBatteryStatus(BatteryStatus status);
     void updateLinearSpeed(float linearSpeed);
     void updateAngularSpeed(float angularSpeed);
     void updatePosition(float x, float y);
-    void updateWiFiStatus(WiFiStatus status);
-    void updateBatteryStatus(BatteryStatus status);
     void updatePlatformStatus(PlatformStatus status);
 };
 

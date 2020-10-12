@@ -29,7 +29,9 @@ public:
     void stop();
 
 private:
-    void wiFiEventCallback(WiFiStatus wiFiStatus, std::string reason);
+    void wiFiEventCallback(WiFiStatus wiFiStatus, const std::string& reason);
+    void connectToRosCallback(const std::string& platformName);
+    void disconnectFromRosCallback();
 };
 
 
