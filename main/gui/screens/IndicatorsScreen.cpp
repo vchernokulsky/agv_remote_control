@@ -30,7 +30,7 @@ void IndicatorsScreen::initializeGui() {
     lblPlatformName = lv_label_create(screen, nullptr);
     lv_label_set_text(lblPlatformName, PLATFORM_NOT_CONNECTED.c_str());
     lv_label_set_long_mode(lblPlatformName, LV_LABEL_LONG_SROLL_CIRC);
-    lv_obj_set_size(lblPlatformName, 180, 20);
+    lv_obj_set_size(lblPlatformName, 220, 20);
     lv_obj_align(lblPlatformName, nullptr, LV_ALIGN_IN_TOP_LEFT, 5, 5);
 
     lblWiFiStatus = lv_label_create(screen, nullptr);
