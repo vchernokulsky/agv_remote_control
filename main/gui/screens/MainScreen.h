@@ -18,8 +18,11 @@ private:
     lv_obj_t *activeScreen = nullptr;
 
 public:
-    MainScreen();
+    explicit MainScreen(SemaphoreHandle_t guiSemaphore);
     virtual ~MainScreen();
+
+    IndicatorsScreen *getIndicatorScreen();
+    LogScreen *getLogScreen();
 
 protected:
     void initializeGui() override;

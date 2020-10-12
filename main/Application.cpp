@@ -10,13 +10,18 @@
 #include <esp_log.h>
 #include <esp_netif.h>
 
-void Application::start() {
-    mainScreen = new MainScreen();
+#include <utility>
 
-    lvGlApp = new LvGlApp(mainScreen);
+void Application::start() {
+    lvGlApp = new LvGlApp();
+
+    mainScreen = new MainScreen(lvGlApp->getGuiSemaphore());
+
+    lvGlApp->setMainScreen(mainScreen);
     lvGlApp->runEventLoop();
 
     wiFiManager = new WiFiManager();
+    wiFiManager->onWiFiEvent = [this](WiFiStatus wiFiStatus, std::string reason) { wiFiEventCallback(wiFiStatus, std::move(reason)); };
 
     ESP_LOGI("Main", "Wi-Fi Client Starting...");
     wiFiManager->start_wifi_client();
@@ -79,4 +84,11 @@ void Application::stop() {
 
     delete mainScreen;
     mainScreen = nullptr;
+}
+
+void Application::wiFiEventCallback(WiFiStatus wiFiStatus, std::string reason) {
+    auto *indicatorScreen = mainScreen->getIndicatorScreen();
+
+    indicatorScreen->updateWiFiStatus(wiFiStatus);
+    //TODO: write reason to log
 }

@@ -24,6 +24,7 @@ private:
 
     TaskHandle_t eventLoopTaskHandle = nullptr;
 
+    std::atomic_bool isRunning = ATOMIC_VAR_INIT(false);
     std::atomic_bool isCancelled = ATOMIC_VAR_INIT(false);
 
     lv_color_t buffer1[DISP_BUF_SIZE] = {};
@@ -34,13 +35,17 @@ private:
 
     esp_timer_handle_t tickTimer = nullptr;
 
-    SemaphoreHandle_t guiSemaphore = xSemaphoreCreateMutex();
+    SemaphoreHandle_t guiSemaphore = nullptr;
 
 public:
-    explicit LvGlApp(ScreenBase *mainScreen);
+    LvGlApp();
+    virtual ~LvGlApp();
 
     void runEventLoop();
     void cancelEventLoop();
+
+    SemaphoreHandle_t getGuiSemaphore();
+    void setMainScreen(ScreenBase *mainScreen);
 
 private:
     void eventLoopTask();

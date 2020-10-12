@@ -6,6 +6,7 @@
 #include "WiFiManager.h"
 
 #include <cstring>
+#include <utility>
 #include <esp_log.h>
 #include <esp_netif.h>
 #include <esp_event.h>
@@ -122,68 +123,72 @@ void WiFiManager::gotIpEventHandlerWrapper(void* eventHandlerArg,
 
 void WiFiManager::wiFiEventHandler(__unused esp_event_base_t eventBase,
                                    int32_t eventId,
-                                   __unused void* eventData) {
+                                   void* eventData) {
     switch (eventId) {
-        case WIFI_EVENT_STA_START:
+        case WIFI_EVENT_STA_START: {
             ESP_LOGD(LOG_TAG, "STA start");
             isWiFiClientStarted = true;
+            fireWiFiEvent(WiFiStatus::Connecting, "");
             break;
-        case WIFI_EVENT_STA_STOP:
+        }
+        case WIFI_EVENT_STA_STOP: {
             ESP_LOGD(LOG_TAG, "STA stop");
             isWiFiClientStarted = false;
+            fireWiFiEvent(WiFiStatus::NotConnected, "");
             break;
-        case WIFI_EVENT_STA_CONNECTED:
+        }
+        case WIFI_EVENT_STA_CONNECTED: {
             ESP_LOGD(LOG_TAG, "Connected to AP");
             isWiFiConnectionEstablished = true;
+            fireWiFiEvent(WiFiStatus::ConnectionEstablished, "Successfully connected to Wi-Fi");
             break;
-        case WIFI_EVENT_STA_DISCONNECTED:
-            {
-                auto *event = (wifi_event_sta_disconnected_t *)eventData;
-                ESP_LOGW(LOG_TAG, "Disconnected from AP. Reason: %d", event->reason);
-                isWiFiConnectionEstablished = false;
-                break;
-            }
-        case WIFI_EVENT_STA_WPS_ER_SUCCESS:
-            {
-                ESP_LOGD(LOG_TAG, "WPS succeeds in enrollee mode");
-
-                //TODO: ESP-IDF v4.1 doesn't support multiple WPS credentials (fix present in master but not included to release).
-                //      Need to implement it later. See: https://github.com/espressif/esp-idf/commit/81f037a2999992fbe184b4b8871a4c670d8fd804
-
-                /*
-                 * If only one AP credential is received from WPS, there will be no event data and
-                 * esp_wifi_set_config() is already called by WPS modules for backward compatibility
-                 * with legacy apps. So directly attempt connection here.
-                 */
-                ESP_ERROR_CHECK(esp_wifi_wps_disable());
-                ESP_ERROR_CHECK(esp_wifi_connect());
-            }
+        }
+        case WIFI_EVENT_STA_DISCONNECTED: {
+            auto *event = (wifi_event_sta_disconnected_t *)eventData;
+            ESP_LOGW(LOG_TAG, "Disconnected from AP. Reason: %d", event->reason);
+            isWiFiConnectionEstablished = false;
+            fireWiFiEvent(WiFiStatus::ConnectionFailed, "Connection to Wi-Fi failed"); //TODO: add detail reason
             break;
-        case WIFI_EVENT_STA_WPS_ER_FAILED:
-            {
-                ESP_LOGW(LOG_TAG, "WPS fails in enrollee mode");
+        }
+        case WIFI_EVENT_STA_WPS_ER_SUCCESS: {
+            ESP_LOGD(LOG_TAG, "WPS succeeds in enrollee mode");
 
-                wpsConfig = getWpsConfig();
+            //TODO: ESP-IDF v4.1 doesn't support multiple WPS credentials (fix present in master but not included to release).
+            //      Need to implement it later. See: https://github.com/espressif/esp-idf/commit/81f037a2999992fbe184b4b8871a4c670d8fd804
 
-                ESP_ERROR_CHECK(esp_wifi_wps_disable());
-                ESP_ERROR_CHECK(esp_wifi_wps_enable(&wpsConfig));
-                ESP_ERROR_CHECK(esp_wifi_wps_start(0));
-            }
+            /*
+             * If only one AP credential is received from WPS, there will be no event data and
+             * esp_wifi_set_config() is already called by WPS modules for backward compatibility
+             * with legacy apps. So directly attempt connection here.
+             */
+            ESP_ERROR_CHECK(esp_wifi_wps_disable());
+            ESP_ERROR_CHECK(esp_wifi_connect());
             break;
-        case WIFI_EVENT_STA_WPS_ER_TIMEOUT:
-            {
-                ESP_LOGW(LOG_TAG, "WPS timeout in enrollee mode");
+        }
+        case WIFI_EVENT_STA_WPS_ER_FAILED: {
+            ESP_LOGW(LOG_TAG, "WPS fails in enrollee mode");
 
-                wpsConfig = getWpsConfig();
+            wpsConfig = getWpsConfig();
 
-                ESP_ERROR_CHECK(esp_wifi_wps_disable());
-                ESP_ERROR_CHECK(esp_wifi_wps_enable(&wpsConfig));
-                ESP_ERROR_CHECK(esp_wifi_wps_start(0));
-            }
+            ESP_ERROR_CHECK(esp_wifi_wps_disable());
+            ESP_ERROR_CHECK(esp_wifi_wps_enable(&wpsConfig));
+            ESP_ERROR_CHECK(esp_wifi_wps_start(0));
             break;
-        default:
+        }
+        case WIFI_EVENT_STA_WPS_ER_TIMEOUT: {
+            ESP_LOGW(LOG_TAG, "WPS timeout in enrollee mode");
+
+            wpsConfig = getWpsConfig();
+
+            ESP_ERROR_CHECK(esp_wifi_wps_disable());
+            ESP_ERROR_CHECK(esp_wifi_wps_enable(&wpsConfig));
+            ESP_ERROR_CHECK(esp_wifi_wps_start(0));
+            break;
+        }
+        default: {
             ESP_LOGV(LOG_TAG, "Unhandled event id: %d", eventId);
             break;
+        }
     }
 }
 
@@ -207,4 +212,9 @@ esp_wps_config_t WiFiManager::getWpsConfig() {
     strlcpy(espWpsConfig.factory_info.device_name, CONFIG_AGV_RC_WPS_DEVICE_NAME, sizeof(espWpsConfig.factory_info.device_name));
 
     return espWpsConfig;
+}
+
+void WiFiManager::fireWiFiEvent(WiFiStatus wiFiStatus, std::string reason) const {
+    if (onWiFiEvent != nullptr)
+        onWiFiEvent(wiFiStatus, std::move(reason));
 }

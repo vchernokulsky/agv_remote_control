@@ -15,9 +15,7 @@ private:
     lv_obj_t *lstLog = nullptr;
 
 public:
-    lv_obj_t *screen = nullptr;
-
-    LogScreen() = default;
+    explicit LogScreen(SemaphoreHandle_t guiSemaphore);
     virtual ~LogScreen() = default;
 
     void initializeGui() override;

@@ -7,9 +7,12 @@
 
 
 #include <atomic>
+#include <functional>
 #include <string>
 #include <esp_supplicant/esp_wps.h>
 #include <esp_event_base.h>
+
+#include "WiFiStatus.h"
 
 class WiFiManager {
 private:
@@ -32,6 +35,8 @@ public:
     void connect(const std::string &ssid, const std::string &password);
     void disconnect();
 
+    std::function<void(WiFiStatus wiFiStatus, std::string reason)> onWiFiEvent = nullptr;
+
 private:
     static void wiFiEventHandlerWrapper(void* eventHandlerArg,
                                  esp_event_base_t eventBase,
@@ -48,6 +53,8 @@ private:
     void gotIpEventHandler(esp_event_base_t eventBase, int32_t eventId, void *eventData);
 
     static esp_wps_config_t getWpsConfig();
+
+    void fireWiFiEvent(WiFiStatus wiFiStatus, std::string reason) const;
 };
 
 

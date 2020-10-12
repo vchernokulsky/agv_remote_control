@@ -13,8 +13,9 @@
 
 using namespace std;
 
-IndicatorsScreen::IndicatorsScreen()
-    : NEEDLE_COLORS{ lv_color_make(255, 0, 0) }
+IndicatorsScreen::IndicatorsScreen(SemaphoreHandle_t guiSemaphore) :
+        ScreenBase(guiSemaphore),
+        NEEDLE_COLORS{ lv_color_make(255, 0, 0) }
 {
 }
 
@@ -31,9 +32,9 @@ void IndicatorsScreen::initializeGui() {
     lv_obj_align(lblPlatformName, nullptr, LV_ALIGN_IN_TOP_LEFT, 5, 5);
 
     lblWiFiStatus = lv_label_create(screen, nullptr);
-    lv_label_set_text(lblWiFiStatus, MDI_SYMBOL_WIFI_NOT_FOUND);
+    lv_label_set_text(lblWiFiStatus, wiFiStatusSymbol(WiFiStatus::NotConnected));
     lv_label_set_align(lblWiFiStatus, LV_LABEL_ALIGN_CENTER);
-    lv_obj_set_style_local_text_font(lblWiFiStatus, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &MaterialDesignIconsFont);
+//    lv_obj_set_style_local_text_font(lblWiFiStatus, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &MaterialDesignIconsFont);
     lv_obj_set_size(lblWiFiStatus, 20, 20);
     lv_obj_align(lblWiFiStatus, nullptr, LV_ALIGN_IN_TOP_RIGHT, -25, 5);
 
@@ -138,42 +139,54 @@ void IndicatorsScreen::LinearSpeedFormatterCallback(__unused lv_obj_t *gauge, ch
 }
 
 void IndicatorsScreen::updateLinearSpeed(float linearSpeed) {
+    beginUpdate();
     int16_t linearSpeedGaugeValue = mapFloatToInt16(linearSpeed, MIN_LINEAR_SPEED, MAX_LINEAR_SPEED, -100, 100);
     setGaugeValueWithAnimation(ggLinearSpeed, linearSpeedGaugeValue);
 
     lv_label_set_text_fmt(lblLinearSpeed, "%.2f м/сек", abs(linearSpeed));
     lv_obj_realign(lblLinearSpeed);
+    endUpdate();
 }
 
 void IndicatorsScreen::updateAngularSpeed(float angularSpeed) {
+    beginUpdate();
     int16_t angularSpeedGaugeValue = mapFloatToInt16(angularSpeed, MIN_ANGULAR_SPEED, MAX_ANGULAR_SPEED, -100, 100);
     lv_bar_set_value(barAngularSpeed, angularSpeedGaugeValue, LV_ANIM_ON);
 
     lv_label_set_text_fmt(lblAngularSpeed, "%.2f рад/сек", abs(angularSpeed));
     lv_obj_realign(lblAngularSpeed);
+    endUpdate();
 }
 
 void IndicatorsScreen::updatePosition(float x, float y) {
+    beginUpdate();
     lv_label_set_text_fmt(lblXValue, "%6.2f м", x);
     lv_obj_realign(lblXValue);
 
     lv_label_set_text_fmt(lblYValue, "%6.2f м", y);
     lv_obj_realign(lblYValue);
+    endUpdate();
 }
 
 void IndicatorsScreen::updateWiFiStatus(WiFiStatus status) {
+    beginUpdate();
     lv_label_set_text(lblWiFiStatus, wiFiStatusSymbol(status));
     lv_obj_realign(lblWiFiStatus);
+    endUpdate();
 }
 
 void IndicatorsScreen::updateBatteryStatus(BatteryStatus status) {
+    beginUpdate();
     lv_label_set_text(lblBatteryStatus, batteryStatusSymbol(status));
     lv_obj_realign(lblBatteryStatus);
+    endUpdate();
 }
 
 void IndicatorsScreen::updatePlatformStatus(PlatformStatus status) {
+    beginUpdate();
     lv_obj_set_style_local_bg_color(cntPlatformStatus, LV_CONT_PART_MAIN, LV_STATE_DEFAULT, platformStatusColor(status));
 
     lv_label_set_text_fmt(lblPlatformStatus, "СТАТУС: %s", platformStatusText(status));
     lv_obj_realign(lblPlatformStatus);
+    endUpdate();
 }

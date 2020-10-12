@@ -7,7 +7,13 @@
 
 #include <esp_log.h>
 
-LvGlApp::LvGlApp(ScreenBase *mainScreen) : mainScreen(mainScreen) {
+LvGlApp::LvGlApp() {
+    guiSemaphore = xSemaphoreCreateMutex();
+}
+
+LvGlApp::~LvGlApp() {
+    vSemaphoreDelete(guiSemaphore);
+    guiSemaphore = nullptr;
 }
 
 void LvGlApp::runEventLoop() {
@@ -16,6 +22,9 @@ void LvGlApp::runEventLoop() {
         ESP_LOGW(LOG_TAG, "Can't create `gui-event-loop` task. Error: %d", taskResult);
         abort();
     }
+
+    while (!isRunning)
+        vTaskDelay(pdMS_TO_TICKS(10));
 }
 
 void LvGlApp::cancelEventLoop() {
@@ -30,6 +39,7 @@ void LvGlApp::eventLoopTask() {
     mainScreen->initializeGui();
 
     startTickTimer();
+    isRunning = true;
     while(!isCancelled) {
         vTaskDelay(pdMS_TO_TICKS(10));
 
@@ -38,6 +48,7 @@ void LvGlApp::eventLoopTask() {
             xSemaphoreGive(guiSemaphore);
         }
     }
+    isRunning = false;
     stopTickTimer();
 
     mainScreen->deinitializeGui();
@@ -82,6 +93,14 @@ void LvGlApp::eventLoopTaskHandler(void *arg) {
 
 void LvGlApp::tickTaskHandler(__unused void *arg) {
     lv_tick_inc(TickPeriod);
+}
+
+SemaphoreHandle_t LvGlApp::getGuiSemaphore() {
+    return guiSemaphore;
+}
+
+void LvGlApp::setMainScreen(ScreenBase *mainScreen) {
+    this->mainScreen = mainScreen;
 }
 
 void LvGlApp::driverMonitorCallback(__unused _disp_drv_t *displayDriver, __unused uint32_t flushTime, uint32_t updatedPixels) {

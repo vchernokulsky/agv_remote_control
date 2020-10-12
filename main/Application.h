@@ -27,6 +27,9 @@ private:
 public:
     void start();
     void stop();
+
+private:
+    void wiFiEventCallback(WiFiStatus wiFiStatus, std::string reason);
 };
 
 

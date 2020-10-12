@@ -9,7 +9,7 @@
 #include "../ScreenBase.h"
 
 #include <cmath>
-#include "utils/WiFiStatus.h"
+#include "utils/WiFiStatusExt.h"
 #include "utils/BatteryStatus.h"
 #include "utils/PlatformStatus.h"
 
@@ -49,9 +49,7 @@ private:
 
     static void LinearSpeedFormatterCallback(__unused lv_obj_t *gauge, char *buf, int bufSize, int32_t value);
 public:
-    lv_obj_t *screen = nullptr;
-
-    IndicatorsScreen();
+    explicit IndicatorsScreen(SemaphoreHandle_t guiSemaphore);
     virtual ~IndicatorsScreen() = default;
 
     void initializeGui() override;

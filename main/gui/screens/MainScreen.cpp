@@ -8,9 +8,9 @@
 #include "assets/Montserrat14Font.h"
 #include "assets/Montserrat16Font.h"
 
-MainScreen::MainScreen() {
-    indicatorScreen = new IndicatorsScreen();
-    logScreen = new LogScreen();
+MainScreen::MainScreen(SemaphoreHandle_t guiSemaphore) : ScreenBase(guiSemaphore) {
+    indicatorScreen = new IndicatorsScreen(guiSemaphore);
+    logScreen = new LogScreen(guiSemaphore);
 }
 
 MainScreen::~MainScreen() {
@@ -24,7 +24,7 @@ void MainScreen::initializeGui() {
     indicatorScreen->initializeGui();
     logScreen->initializeGui();
 
-    activeScreen = indicatorScreen->screen;
+    activeScreen = indicatorScreen->getScreen();
 //    activeScreen = logScreen->screen;
 
     lv_scr_load(activeScreen);
@@ -43,3 +43,12 @@ void MainScreen::initializeRussianFonts() {
     theme->font_subtitle = &Montserrat14Font;
     theme->font_title = &Montserrat16Font;
 }
+
+LogScreen *MainScreen::getLogScreen() {
+    return logScreen;
+}
+
+IndicatorsScreen *MainScreen::getIndicatorScreen() {
+    return indicatorScreen;
+}
+

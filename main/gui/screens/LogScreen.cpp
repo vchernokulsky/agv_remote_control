@@ -9,6 +9,10 @@
 #include "assets/Background.h"
 #include "assets/Montserrat12Font.h"
 
+LogScreen::LogScreen(SemaphoreHandle_t guiSemaphore) :
+    ScreenBase(guiSemaphore) {
+}
+
 void LogScreen::initializeGui() {
     screen = lv_obj_create(nullptr, nullptr);
 
