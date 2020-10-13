@@ -6,6 +6,7 @@
 
 
 #include <cstdlib>
+#include <gui/screens/utils/StringExt.h>
 #include "assets/Background.h"
 #include "assets/MaterialDesignIconsFont.h"
 #include "utils/MapValue.h"
@@ -15,10 +16,14 @@ using namespace std;
 
 const std::string IndicatorsScreen::PLATFORM_NOT_CONNECTED = "Платформа не подключена";
 
-IndicatorsScreen::IndicatorsScreen(SemaphoreHandle_t guiSemaphore) :
-        ScreenBase(guiSemaphore),
-        NEEDLE_COLORS{ lv_color_make(255, 0, 0) }
-{
+const lv_color_t IndicatorsScreen::NEEDLE_COLORS[] = { lv_color_make(255, 0, 0) };
+
+IndicatorsScreen::IndicatorsScreen(SemaphoreHandle_t guiSemaphore) : ScreenBase(guiSemaphore) {
+    viewModel = new IndicatorsViewModel();
+}
+
+IndicatorsScreen::~IndicatorsScreen() {
+    delete viewModel;
 }
 
 void IndicatorsScreen::initializeGui() {
@@ -28,20 +33,17 @@ void IndicatorsScreen::initializeGui() {
     lv_img_set_src(imgBackground, &Background);
 
     lblPlatformName = lv_label_create(screen, nullptr);
-    lv_label_set_text(lblPlatformName, PLATFORM_NOT_CONNECTED.c_str());
     lv_label_set_long_mode(lblPlatformName, LV_LABEL_LONG_SROLL_CIRC);
     lv_obj_set_size(lblPlatformName, 220, 20);
     lv_obj_align(lblPlatformName, nullptr, LV_ALIGN_IN_TOP_LEFT, 5, 5);
 
     lblWiFiStatus = lv_label_create(screen, nullptr);
-    lv_label_set_text(lblWiFiStatus, wiFiStatusSymbol(WiFiStatus::NotConnected));
     lv_label_set_align(lblWiFiStatus, LV_LABEL_ALIGN_CENTER);
 //    lv_obj_set_style_local_text_font(lblWiFiStatus, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &MaterialDesignIconsFont);
     lv_obj_set_size(lblWiFiStatus, 20, 20);
     lv_obj_align(lblWiFiStatus, nullptr, LV_ALIGN_IN_TOP_RIGHT, -25, 5);
 
     lblBatteryStatus = lv_label_create(screen, nullptr);
-    lv_label_set_text(lblBatteryStatus, MDI_SYMBOL_BATTERY_NOT_FOUND);
     lv_label_set_align(lblBatteryStatus, LV_LABEL_ALIGN_CENTER);
     lv_obj_set_style_local_text_font(lblBatteryStatus, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &MaterialDesignIconsFont);
     lv_obj_set_size(lblBatteryStatus, 20, 20);
@@ -57,7 +59,6 @@ void IndicatorsScreen::initializeGui() {
     lv_obj_align(ggLinearSpeed, nullptr, LV_ALIGN_IN_LEFT_MID, 15, 0);
 
     lblLinearSpeed = lv_label_create(ggLinearSpeed, nullptr);
-    lv_label_set_text_fmt(lblLinearSpeed, "%.2f м/сек", 0.0f);
     lv_obj_set_style_local_text_font(lblLinearSpeed, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, lv_theme_get_font_subtitle());
     lv_obj_align(lblLinearSpeed, ggLinearSpeed, LV_ALIGN_IN_BOTTOM_MID, 0, -15);
 
@@ -68,7 +69,6 @@ void IndicatorsScreen::initializeGui() {
     lv_obj_align(barAngularSpeed, nullptr, LV_ALIGN_IN_BOTTOM_LEFT, 15, -25);
 
     lblAngularSpeed = lv_label_create(screen, nullptr);
-    lv_label_set_text_fmt(lblAngularSpeed, "%.2f рад/сек", 0.0f);
     lv_label_set_align(lblAngularSpeed, LV_LABEL_ALIGN_CENTER);
     lv_obj_set_style_local_text_font(lblAngularSpeed, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, lv_theme_get_font_subtitle());
     lv_obj_align(lblAngularSpeed, barAngularSpeed, LV_ALIGN_OUT_BOTTOM_MID, 0, 5);
@@ -83,7 +83,6 @@ void IndicatorsScreen::initializeGui() {
     lv_obj_align(lblX, cntPosition, LV_ALIGN_IN_TOP_LEFT, 10, 10);
 
     lblXValue = lv_label_create(cntPosition, nullptr);
-    lv_label_set_text_fmt(lblXValue, "%6.2f м", 0.0);
     lv_obj_align(lblXValue, cntPosition, LV_ALIGN_IN_TOP_RIGHT, -10, 10);
 
     lblY = lv_label_create(cntPosition, nullptr);
@@ -91,7 +90,6 @@ void IndicatorsScreen::initializeGui() {
     lv_obj_align(lblY, cntPosition, LV_ALIGN_IN_BOTTOM_LEFT, 10, -10);
 
     lblYValue = lv_label_create(cntPosition, nullptr);
-    lv_label_set_text_fmt(lblYValue, "%6.2f м", 0.0);
     lv_obj_align(lblYValue, cntPosition, LV_ALIGN_IN_BOTTOM_RIGHT, -10, -10);
 
     cntPlatformStatus = lv_cont_create(screen, nullptr);
@@ -101,10 +99,13 @@ void IndicatorsScreen::initializeGui() {
     lv_obj_set_style_local_bg_color(cntPlatformStatus, LV_CONT_PART_MAIN, LV_STATE_DEFAULT, lv_color_make(0, 128, 0));
 
     lblPlatformStatus = lv_label_create(cntPlatformStatus, nullptr);
-    lv_label_set_text_fmt(lblPlatformStatus, "СТАТУС: %s", "OK");
+
+    updateUiTaskHandle = lv_task_create(timerTaskHandler, 100, LV_TASK_PRIO_MID, this);
 }
 
 void IndicatorsScreen::deinitializeGui() {
+    lv_task_del(updateUiTaskHandle);
+
     lv_obj_del(imgBackground);
 
     lv_obj_del(lblPlatformName);
@@ -127,8 +128,24 @@ void IndicatorsScreen::deinitializeGui() {
     lv_obj_del(lblPlatformStatus);
 }
 
+void IndicatorsScreen::timerTaskHandler(lv_task_t *task) {
+    auto *indicatorsScreen = static_cast<IndicatorsScreen *>(task->user_data);
+
+    auto *viewModel = indicatorsScreen->viewModel;
+
+    viewModel->takeLock();
+    indicatorsScreen->updatePlatformName(viewModel->platformName);
+    indicatorsScreen->updateWiFiStatus(viewModel->wiFiStatus);
+    indicatorsScreen->updateBatteryStatus(viewModel->batteryStatus);
+    indicatorsScreen->updateLinearSpeed(viewModel->linearSpeed);
+    indicatorsScreen->updateAngularSpeed(viewModel->angularSpeed);
+    indicatorsScreen->updatePosition(viewModel->xPosition, viewModel->yPosition);
+    indicatorsScreen->updatePlatformStatus(viewModel->platformStatus);
+    viewModel->giveLock();
+}
+
 void IndicatorsScreen::LinearSpeedFormatterCallback(lv_obj_t *gauge, char *buf, int bufSize, int32_t value) {
-    int pos = lv_snprintf(buf, bufSize, "%.2f", mapInt16ToFloat(value, -100, 100, MIN_LINEAR_SPEED, MAX_LINEAR_SPEED));
+    int pos = lv_snprintf(buf, bufSize, "%.2f", mapInt32ToFloat(value, -100, 100, MIN_LINEAR_SPEED, MAX_LINEAR_SPEED));
 
     // Remove trailing 0 and . (i.e. 1.00 -> 1)
     if (pos > 0) {
@@ -141,61 +158,88 @@ void IndicatorsScreen::LinearSpeedFormatterCallback(lv_obj_t *gauge, char *buf, 
 }
 
 void IndicatorsScreen::updatePlatformName(const std::string& platformName) {
-    beginUpdate();
-    lv_label_set_text(lblPlatformName, platformName.c_str());
-    lv_obj_realign(lblPlatformName);
-    endUpdate();
+    auto oldText = lv_label_get_text(lblPlatformName);
+    if (platformName != oldText) {
+        lv_label_set_text(lblPlatformName, platformName.c_str());
+        lv_obj_realign(lblPlatformName);
+    }
 }
 
 void IndicatorsScreen::updateWiFiStatus(WiFiStatus status) {
-    beginUpdate();
-    lv_label_set_text(lblWiFiStatus, wiFiStatusSymbol(status));
-    lv_obj_realign(lblWiFiStatus);
-    endUpdate();
+    const std::string newText = std::string(wiFiStatusSymbol(status));
+    auto oldText = lv_label_get_text(lblWiFiStatus);
+    if (newText != oldText) {
+        lv_label_set_text(lblWiFiStatus, newText.c_str());
+        lv_obj_realign(lblWiFiStatus);
+    }    
 }
 
 void IndicatorsScreen::updateBatteryStatus(BatteryStatus status) {
-    beginUpdate();
-    lv_label_set_text(lblBatteryStatus, batteryStatusSymbol(status));
-    lv_obj_realign(lblBatteryStatus);
-    endUpdate();
+    const std::string newText = std::string(batteryStatusSymbol(status));
+    auto oldText = lv_label_get_text(lblBatteryStatus);
+    if (newText != oldText) {
+        lv_label_set_text(lblBatteryStatus, newText.c_str());
+        lv_obj_realign(lblBatteryStatus);
+    }
 }
 
-void IndicatorsScreen::updateLinearSpeed(float linearSpeed) {
-    beginUpdate();
-    int16_t linearSpeedGaugeValue = mapFloatToInt16(linearSpeed, MIN_LINEAR_SPEED, MAX_LINEAR_SPEED, -100, 100);
-    setGaugeValueWithAnimation(ggLinearSpeed, linearSpeedGaugeValue);
+void IndicatorsScreen::updateLinearSpeed(double linearSpeed) {
+    int32_t newValue = mapFloatToInt32((float)linearSpeed, MIN_LINEAR_SPEED, MAX_LINEAR_SPEED, -100, 100);
+    int32_t oldValue = lv_gauge_get_value(ggLinearSpeed, 0);
 
-    lv_label_set_text_fmt(lblLinearSpeed, "%.2f м/сек", abs(linearSpeed));
-    lv_obj_realign(lblLinearSpeed);
-    endUpdate();
+    if (newValue != oldValue) {
+        setGaugeValueWithAnimation(ggLinearSpeed, newValue); // with animation
+//        lv_gauge_set_value(ggLinearSpeed, 0, newValue); // without animation
+    }
+
+    const std::string newText = formatString("%.2f м/сек", abs(linearSpeed));
+    auto oldText = lv_label_get_text(lblLinearSpeed);
+    if (newText != oldText) {
+        lv_label_set_text(lblLinearSpeed, newText.c_str());
+        lv_obj_realign(lblLinearSpeed);
+    }
 }
 
-void IndicatorsScreen::updateAngularSpeed(float angularSpeed) {
-    beginUpdate();
-    int16_t angularSpeedGaugeValue = mapFloatToInt16(angularSpeed, MIN_ANGULAR_SPEED, MAX_ANGULAR_SPEED, -100, 100);
-    lv_bar_set_value(barAngularSpeed, angularSpeedGaugeValue, LV_ANIM_ON);
+void IndicatorsScreen::updateAngularSpeed(double angularSpeed) {
+    int16_t newValue = mapFloatToInt16((float)angularSpeed, MIN_ANGULAR_SPEED, MAX_ANGULAR_SPEED, -100, 100);
+    int16_t oldValue = lv_bar_get_value(barAngularSpeed);
 
-    lv_label_set_text_fmt(lblAngularSpeed, "%.2f рад/сек", abs(angularSpeed));
-    lv_obj_realign(lblAngularSpeed);
-    endUpdate();
+    if (newValue != oldValue) {
+        lv_bar_set_value(barAngularSpeed, newValue, LV_ANIM_ON); // with/without animation
+    }
+
+    const std::string newText = formatString("%.2f рад/сек", abs(angularSpeed));
+    auto oldText = lv_label_get_text(lblAngularSpeed);
+    if (newText != oldText) {
+        lv_label_set_text(lblAngularSpeed, newText.c_str());
+        lv_obj_realign(lblAngularSpeed);
+    }
 }
 
-void IndicatorsScreen::updatePosition(float x, float y) {
-    beginUpdate();
-    lv_label_set_text_fmt(lblXValue, "%6.2f м", x);
-    lv_obj_realign(lblXValue);
+void IndicatorsScreen::updatePosition(double x, double y) {
+    const std::string newXText = formatString("%6.2f м", x);
+    auto oldXText = lv_label_get_text(lblXValue);
+    if (newXText != oldXText) {
+        lv_label_set_text(lblXValue, newXText.c_str());
+        lv_obj_realign(lblXValue);
+    }
 
-    lv_label_set_text_fmt(lblYValue, "%6.2f м", y);
-    lv_obj_realign(lblYValue);
-    endUpdate();
+    const std::string newYText = formatString("%6.2f м", y);
+    auto oldYText = lv_label_get_text(lblYValue);
+    if (newYText != oldYText) {
+        lv_label_set_text(lblYValue, newYText.c_str());
+        lv_obj_realign(lblYValue);
+    }
 }
 
 void IndicatorsScreen::updatePlatformStatus(PlatformStatus status) {
-    beginUpdate();
-    lv_obj_set_style_local_bg_color(cntPlatformStatus, LV_CONT_PART_MAIN, LV_STATE_DEFAULT, platformStatusColor(status));
+    const std::string newText = formatString("СТАТУС: %s", platformStatusText(status));
+    auto oldText = lv_label_get_text(lblPlatformStatus);
 
-    lv_label_set_text_fmt(lblPlatformStatus, "СТАТУС: %s", platformStatusText(status));
-    lv_obj_realign(lblPlatformStatus);
-    endUpdate();
+    if (newText != oldText) {
+        lv_obj_set_style_local_bg_color(cntPlatformStatus, LV_CONT_PART_MAIN, LV_STATE_DEFAULT, platformStatusColor(status));
+
+        lv_label_set_text(lblPlatformStatus, newText.c_str());
+        lv_obj_realign(lblPlatformStatus);
+    }
 }

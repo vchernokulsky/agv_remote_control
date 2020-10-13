@@ -13,12 +13,13 @@
 #include "utils/WiFiStatusExt.h"
 #include "utils/BatteryStatus.h"
 #include "utils/PlatformStatus.h"
+#include "IndicatorsViewModel.h"
 
 class IndicatorsScreen : public ScreenBase {
 private:
     constexpr static char const *LOG_TAG = "IndicatorsScreen";
 
-    const lv_color_t NEEDLE_COLORS[1];
+    static const lv_color_t NEEDLE_COLORS[];
 
     constexpr static const float MIN_LINEAR_SPEED = -2;
     constexpr static const float MAX_LINEAR_SPEED = 2;
@@ -48,23 +49,28 @@ private:
     lv_obj_t *cntPlatformStatus = nullptr;
     lv_obj_t *lblPlatformStatus = nullptr;
 
-    static void LinearSpeedFormatterCallback(lv_obj_t *gauge, char *buf, int bufSize, int32_t value);
-
+    lv_task_t *updateUiTaskHandle = nullptr;
 public:
     static const std::string PLATFORM_NOT_CONNECTED;
 
+    IndicatorsViewModel *viewModel = nullptr;
+
     explicit IndicatorsScreen(SemaphoreHandle_t guiSemaphore);
-    virtual ~IndicatorsScreen() = default;
+    virtual ~IndicatorsScreen();
 
     void initializeGui() override;
     void deinitializeGui() override;
 
+private:
+    static void timerTaskHandler(lv_task_t *task);
+    static void LinearSpeedFormatterCallback(lv_obj_t *gauge, char *buf, int bufSize, int32_t value);
+
     void updatePlatformName(const std::string& platformName);
     void updateWiFiStatus(WiFiStatus status);
     void updateBatteryStatus(BatteryStatus status);
-    void updateLinearSpeed(float linearSpeed);
-    void updateAngularSpeed(float angularSpeed);
-    void updatePosition(float x, float y);
+    void updateLinearSpeed(double linearSpeed);
+    void updateAngularSpeed(double angularSpeed);
+    void updatePosition(double x, double y);
     void updatePlatformStatus(PlatformStatus status);
 };
 

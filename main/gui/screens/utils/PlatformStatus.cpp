@@ -6,7 +6,7 @@
 
 #include <cstdlib>
 
-char const* platformStatusText(PlatformStatus status) {
+const char *platformStatusText(PlatformStatus status) {
     switch (status) {
         case PlatformStatus::OK:
             return "OK";

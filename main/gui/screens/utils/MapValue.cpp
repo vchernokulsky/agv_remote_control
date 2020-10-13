@@ -26,3 +26,11 @@ int16_t mapFloatToInt16(float floatValue, float minFloatValue, float maxFloatVal
 float mapInt16ToFloat(int16_t int16Value, int16_t minInt16Value, int16_t maxInt16Value, float minFloatValue, float maxFloatValue) {
     return map(int16Value, minInt16Value, maxInt16Value, minFloatValue, maxFloatValue);
 }
+
+int32_t mapFloatToInt32(float floatValue, float minFloatValue, float maxFloatValue, int32_t minInt32Value, int32_t maxInt32Value) {
+    return map(floatValue, minFloatValue, maxFloatValue, minInt32Value, maxInt32Value);
+}
+
+float mapInt32ToFloat(int32_t int32Value, int32_t minInt32Value, int32_t maxInt32Value, float minFloatValue, float maxFloatValue) {
+    return map(int32Value, minInt32Value, maxInt32Value, minFloatValue, maxFloatValue);
+}

@@ -60,6 +60,7 @@ void Application::start() {
     rosClient = new RosClient(rosManagerIp4.addr, rosManagerPort);
     rosClient->onConnect = [this](const std::string& platformName) { connectToRosCallback(platformName); };
     rosClient->onDisconnect = [this]() { disconnectFromRosCallback(); };
+    rosClient->onNavigationMessage = [this](const geometry_msgs::Twist &message) { navigationMessageCallback(message); };
     rosClient->connect();
 
     navigationManager = new NavigationManager(rosClient);
@@ -91,18 +92,38 @@ void Application::stop() {
 void Application::wiFiEventCallback(WiFiStatus wiFiStatus, const std::string& reason) {
     auto *indicatorScreen = mainScreen->getIndicatorScreen();
 
-    indicatorScreen->updateWiFiStatus(wiFiStatus);
+    auto *viewModel = indicatorScreen->viewModel;
+    viewModel->takeLock();
+    viewModel->wiFiStatus = wiFiStatus;
+    viewModel->giveLock();
+
     //TODO: write reason to log
 }
 
 void Application::connectToRosCallback(const std::string& platformName) {
     auto *indicatorScreen = mainScreen->getIndicatorScreen();
 
-    indicatorScreen->updatePlatformName(platformName.empty() ? IndicatorsScreen::PLATFORM_NOT_CONNECTED : platformName);
+    auto *viewModel = indicatorScreen->viewModel;
+    viewModel->takeLock();
+    viewModel->platformName = platformName.empty() ? IndicatorsScreen::PLATFORM_NOT_CONNECTED : platformName;
+    viewModel->giveLock();
 }
 
 void Application::disconnectFromRosCallback() {
     auto *indicatorScreen = mainScreen->getIndicatorScreen();
 
-    indicatorScreen->updatePlatformName(IndicatorsScreen::PLATFORM_NOT_CONNECTED);
+    auto *viewModel = indicatorScreen->viewModel;
+    viewModel->takeLock();
+    viewModel->platformName = IndicatorsScreen::PLATFORM_NOT_CONNECTED;
+    viewModel->giveLock();
+}
+
+void Application::navigationMessageCallback(const geometry_msgs::Twist &twist) {
+    auto *indicatorScreen = mainScreen->getIndicatorScreen();
+
+    auto *viewModel = indicatorScreen->viewModel;
+    viewModel->takeLock();
+    viewModel->linearSpeed = twist.linear.x;
+    viewModel->angularSpeed = twist.angular.z;
+    viewModel->giveLock();
 }

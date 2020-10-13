@@ -13,7 +13,7 @@ enum class PlatformStatus {
     FAULT,
 };
 
-char const* platformStatusText(PlatformStatus status);
+const char *platformStatusText(PlatformStatus status);
 lv_color_t platformStatusColor(PlatformStatus status);
 
 #endif //AGV_REMOTE_CONTROL_PLATFORMSTATUS_H

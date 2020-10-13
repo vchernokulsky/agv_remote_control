@@ -4,7 +4,7 @@
 
 #include "lvgl/lvgl.h"
 
-const uint32_t GAUGE_ANIMATION_DURATION = 200; // ms
+const uint32_t GAUGE_ANIMATION_DURATION = 50; // ms
 
 void gaugeAnimationHandler(lv_obj_t *gauge, lv_anim_value_t value);
 

@@ -45,6 +45,15 @@ void RosClient::connect() {
         abort();
     }
 
+    navigationMessageSubscriber = new ros::Subscriber<geometry_msgs::Twist, RosClient>(
+            NAVIGATION_TOPIC_NAME.c_str(),
+            &RosClient::navigationMessageSubscriberHandler,
+            this);
+    if(!nodeHandle->subscribe(*navigationMessageSubscriber)) {
+        ESP_LOGE(LOG_TAG, "Can't subscribe navigation subscriber. Achieved MAX_SUBSCRIBERS limit.");
+        abort();
+    }
+
     runTask("ros-client-loop", 2, 4 * configMINIMAL_STACK_SIZE);
 
     fireOnConnect();
@@ -125,4 +134,9 @@ void RosClient::fireOnConnect() {
 void RosClient::fireOnDisconnect() {
     if (onDisconnect != nullptr)
         onDisconnect();
+}
+
+void RosClient::navigationMessageSubscriberHandler(const geometry_msgs::Twist &message) {
+    if (onNavigationMessage != nullptr)
+        onNavigationMessage(message);
 }

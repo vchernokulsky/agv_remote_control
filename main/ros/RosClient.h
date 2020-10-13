@@ -34,6 +34,7 @@ private:
 
     geometry_msgs::Twist navigationMessage = {};
     ros::Publisher *navigationMessagePublisher = nullptr;
+    ros::Subscriber<geometry_msgs::Twist, RosClient> *navigationMessageSubscriber = nullptr;
 
     std::string PlatformName;
     double MaxLinearSpeed = 1; // m/sec (initiated by default value)
@@ -53,9 +54,12 @@ public:
 
     std::function<void(const std::string &platformName)> onConnect = nullptr;
     std::function<void()> onDisconnect = nullptr;
+    std::function<void(const geometry_msgs::Twist &message)> onNavigationMessage = nullptr;
 
 private:
     void task() override;
+
+    void navigationMessageSubscriberHandler(const geometry_msgs::Twist &message);
 
     bool readParam(const std::string &paramName, double &value);
     bool readParam(const std::string &paramName, std::string &value);
