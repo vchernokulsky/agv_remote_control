@@ -54,7 +54,7 @@ void IndicatorsScreen::initializeGui() {
     lv_gauge_set_range(ggLinearSpeed, -100, 100);
     lv_gauge_set_scale(ggLinearSpeed, 270, 9, 5);
     lv_gauge_set_needle_count(ggLinearSpeed, 1, NEEDLE_COLORS);
-    lv_gauge_set_formatter_cb(ggLinearSpeed, LinearSpeedFormatterCallback);
+    lv_gauge_set_formatter_cb(ggLinearSpeed, linearSpeedFormatterCallback);
     lv_obj_set_style_local_pad_inner(ggLinearSpeed, LV_GAUGE_PART_MAIN, LV_STATE_DEFAULT, 15);
     lv_obj_align(ggLinearSpeed, nullptr, LV_ALIGN_IN_LEFT_MID, 15, 0);
 
@@ -144,7 +144,7 @@ void IndicatorsScreen::timerTaskHandler(lv_task_t *task) {
     viewModel->giveLock();
 }
 
-void IndicatorsScreen::LinearSpeedFormatterCallback(lv_obj_t *gauge, char *buf, int bufSize, int32_t value) {
+void IndicatorsScreen::linearSpeedFormatterCallback(lv_obj_t *gauge, char *buf, int bufSize, int32_t value) {
     int pos = lv_snprintf(buf, bufSize, "%.2f", mapInt32ToFloat(value, -100, 100, MIN_LINEAR_SPEED, MAX_LINEAR_SPEED));
 
     // Remove trailing 0 and . (i.e. 1.00 -> 1)

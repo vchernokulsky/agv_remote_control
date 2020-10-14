@@ -63,7 +63,7 @@ public:
 
 private:
     static void timerTaskHandler(lv_task_t *task);
-    static void LinearSpeedFormatterCallback(lv_obj_t *gauge, char *buf, int bufSize, int32_t value);
+    static void linearSpeedFormatterCallback(lv_obj_t *gauge, char *buf, int bufSize, int32_t value);
 
     void updatePlatformName(const std::string& platformName);
     void updateWiFiStatus(WiFiStatus status);
