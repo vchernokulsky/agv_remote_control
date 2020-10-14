@@ -12,6 +12,7 @@
 #include <network/MDnsManager.h>
 #include <ros/RosClient.h>
 #include <navigation/NavigationManager.h>
+#include <navigation/ButtonsManager.h>
 
 class Application {
 private:
@@ -23,6 +24,7 @@ private:
     RosClient *rosClient = nullptr;
 
     NavigationManager *navigationManager = nullptr;
+    ButtonsManager *buttonsManager = nullptr;
 
 public:
     void start();
@@ -33,6 +35,7 @@ private:
     void connectToRosCallback(const std::string& platformName);
     void disconnectFromRosCallback();
     void positionMessageCallback(const nav_msgs::Odometry &odometry);
+    void menuButtonCallback();
 };
 
 

@@ -15,7 +15,7 @@ private:
     IndicatorsScreen *indicatorScreen;
     LogScreen *logScreen;
 
-    lv_obj_t *activeScreen = nullptr;
+    ScreenBase *activeScreen = nullptr;
 
 public:
     explicit MainScreen(SemaphoreHandle_t guiSemaphore);
@@ -23,6 +23,8 @@ public:
 
     IndicatorsScreen *getIndicatorScreen();
     LogScreen *getLogScreen();
+
+    void toggleScreen();
 
 protected:
     void initializeGui() override;

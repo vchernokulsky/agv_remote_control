@@ -65,9 +65,15 @@ void Application::start() {
 
     navigationManager = new NavigationManager(rosClient);
     navigationManager->start();
+
+    buttonsManager = new ButtonsManager();
+    buttonsManager->onMenuButton = [this]() { menuButtonCallback(); };
 }
 
 void Application::stop() {
+    delete buttonsManager;
+    buttonsManager = nullptr;
+
     navigationManager->stop(true);
     delete navigationManager;
     navigationManager = nullptr;
@@ -128,4 +134,8 @@ void Application::positionMessageCallback(const nav_msgs::Odometry &odometry) {
     viewModel->xPosition = odometry.pose.pose.position.x;
     viewModel->yPosition = odometry.pose.pose.position.y;
     viewModel->giveLock();
+}
+
+void Application::menuButtonCallback() {
+    mainScreen->toggleScreen();
 }

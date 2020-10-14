@@ -24,10 +24,12 @@ void MainScreen::initializeGui() {
     indicatorScreen->initializeGui();
     logScreen->initializeGui();
 
-    activeScreen = indicatorScreen->getScreen();
-//    activeScreen = logScreen->screen;
+    beginUpdate();
+    activeScreen = indicatorScreen;
+//    activeScreen = logScreen;
 
-    lv_scr_load(activeScreen);
+    lv_scr_load(activeScreen->getScreen());
+    endUpdate();
 }
 
 void MainScreen::deinitializeGui() {
@@ -50,5 +52,17 @@ LogScreen *MainScreen::getLogScreen() {
 
 IndicatorsScreen *MainScreen::getIndicatorScreen() {
     return indicatorScreen;
+}
+
+void MainScreen::toggleScreen() {
+    beginUpdate();
+    if (activeScreen == indicatorScreen) {
+        activeScreen = logScreen;
+    } else {
+        activeScreen = indicatorScreen;
+    }
+
+    lv_scr_load(activeScreen->getScreen());
+    endUpdate();
 }
 

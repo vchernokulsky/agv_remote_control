@@ -949,6 +949,14 @@ CONFIG_AGV_RC_WPS_DEVICE_NAME="AGV Remote Control"
 # end of AGV Remote Control
 
 #
+# Button
+#
+CONFIG_BUTTON_USE_RTOS_TIMER=y
+# CONFIG_BUTTON_USE_ESP_TIMER is not set
+CONFIG_IO_GLITCH_FILTER_TIME_MS=50
+# end of Button
+
+#
 # LVGL configuration
 #
 # CONFIG_LV_COLOR_SCREEN_TRANSP is not set
