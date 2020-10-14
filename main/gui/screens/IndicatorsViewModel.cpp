@@ -25,5 +25,8 @@ void IndicatorsViewModel::takeLock() {
 }
 
 void IndicatorsViewModel::giveLock() {
-    xSemaphoreGive(semaphoreHandle);
+    if (xSemaphoreGive(semaphoreHandle) == pdFALSE) {
+        ESP_LOGE(LOG_TAG, "Can't give semaphore.");
+        abort();
+    }
 }
