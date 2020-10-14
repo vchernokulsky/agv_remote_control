@@ -32,27 +32,27 @@ void RosClient::connect() {
     }
     ESP_LOGD(LOG_TAG, "Connected to ROS Master");
 
-    if (!readParam(PLATFORM_NAME_PARAM, PlatformName))
-        ESP_LOGW(LOG_TAG, "Use default %s param value: %s", PLATFORM_NAME_PARAM.c_str(), PlatformName.c_str());
-    if (!readParam(MAX_LINEAR_SPEED_PARAM, MaxLinearSpeed))
-        ESP_LOGW(LOG_TAG, "Use default %s param value: %f", MAX_LINEAR_SPEED_PARAM.c_str(), MaxLinearSpeed);
-    if (!readParam(MAX_ANGULAR_SPEED_PARAM, MaxAngularSpeed))
-        ESP_LOGW(LOG_TAG, "Use default %s param value: %f", MAX_ANGULAR_SPEED_PARAM.c_str(), MaxAngularSpeed);
-
     navigationMessagePublisher = new ros::Publisher(NAVIGATION_TOPIC_NAME.c_str(), &navigationMessage);
     if(!nodeHandle->advertise(*navigationMessagePublisher)) {
         ESP_LOGE(LOG_TAG, "Can't advertise navigation publisher. Achieved MAX_PUBLISHERS limit.");
         abort();
     }
 
-    navigationMessageSubscriber = new ros::Subscriber<geometry_msgs::Twist, RosClient>(
-            NAVIGATION_TOPIC_NAME.c_str(),
-            &RosClient::navigationMessageSubscriberHandler,
+    positionMessageSubscriber = new ros::Subscriber<nav_msgs::Odometry, RosClient>(
+            POSITION_TOPIC_NAME.c_str(),
+            &RosClient::positionMessageSubscriberHandler,
             this);
-    if(!nodeHandle->subscribe(*navigationMessageSubscriber)) {
+    if(!nodeHandle->subscribe(*positionMessageSubscriber)) {
         ESP_LOGE(LOG_TAG, "Can't subscribe navigation subscriber. Achieved MAX_SUBSCRIBERS limit.");
         abort();
     }
+
+    if (!readParam(PLATFORM_NAME_PARAM, PlatformName))
+        ESP_LOGW(LOG_TAG, "Use default %s param value: %s", PLATFORM_NAME_PARAM.c_str(), PlatformName.c_str());
+    if (!readParam(MAX_LINEAR_SPEED_PARAM, MaxLinearSpeed))
+        ESP_LOGW(LOG_TAG, "Use default %s param value: %f", MAX_LINEAR_SPEED_PARAM.c_str(), MaxLinearSpeed);
+    if (!readParam(MAX_ANGULAR_SPEED_PARAM, MaxAngularSpeed))
+        ESP_LOGW(LOG_TAG, "Use default %s param value: %f", MAX_ANGULAR_SPEED_PARAM.c_str(), MaxAngularSpeed);
 
     runTask("ros-client-loop", 2, 4 * configMINIMAL_STACK_SIZE);
 
@@ -69,6 +69,12 @@ void RosClient::disconnect() {
 
     delete navigationMessagePublisher;
     navigationMessagePublisher = nullptr;
+
+    //TODO: error: deleting object of polymorphic class type 'ros::Subscriber<nav_msgs::Odometry, RosClient>' which has
+    //      non-virtual destructor might cause undefined behavior [-Werror=delete-non-virtual-dtor]
+    //
+    // delete positionMessageSubscriber;
+    //positionMessageSubscriber = nullptr;
 
     fireOnDisconnect();
 }
@@ -92,6 +98,11 @@ bool RosClient::sendNavigationMessage(double linearSpeed, double angularSpeed) {
     navigationMessage.linear.x = linearSpeed;
     navigationMessage.angular.z = angularSpeed;
     return navigationMessagePublisher->publish(&navigationMessage) > 0;
+}
+
+void RosClient::positionMessageSubscriberHandler(const nav_msgs::Odometry &message) {
+    if (onPositionMessage != nullptr)
+        onPositionMessage(message);
 }
 
 bool RosClient::readParam(const std::string &paramName, double &value) {
@@ -131,12 +142,7 @@ void RosClient::fireOnConnect() {
         onConnect(PlatformName);
 }
 
-void RosClient::fireOnDisconnect() {
+void RosClient::fireOnDisconnect() const {
     if (onDisconnect != nullptr)
         onDisconnect();
-}
-
-void RosClient::navigationMessageSubscriberHandler(const geometry_msgs::Twist &message) {
-    if (onNavigationMessage != nullptr)
-        onNavigationMessage(message);
 }

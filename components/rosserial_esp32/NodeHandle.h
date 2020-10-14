@@ -10,7 +10,7 @@
 
 #include "ros_lib/ros/node_handle.h"
 
-class NodeHandle: public ros::NodeHandle_<Esp32Hardware> {
+class NodeHandle: public ros::NodeHandle_<Esp32Hardware, 25, 25, 2048, 2048> {
 public:
     virtual ~NodeHandle() = default;
 

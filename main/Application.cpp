@@ -60,7 +60,7 @@ void Application::start() {
     rosClient = new RosClient(rosManagerIp4.addr, rosManagerPort);
     rosClient->onConnect = [this](const std::string& platformName) { connectToRosCallback(platformName); };
     rosClient->onDisconnect = [this]() { disconnectFromRosCallback(); };
-    rosClient->onNavigationMessage = [this](const geometry_msgs::Twist &message) { navigationMessageCallback(message); };
+    rosClient->onPositionMessage = [this](const nav_msgs::Odometry &message) { positionMessageCallback(message); };
     rosClient->connect();
 
     navigationManager = new NavigationManager(rosClient);
@@ -118,12 +118,14 @@ void Application::disconnectFromRosCallback() {
     viewModel->giveLock();
 }
 
-void Application::navigationMessageCallback(const geometry_msgs::Twist &twist) {
+void Application::positionMessageCallback(const nav_msgs::Odometry &odometry) {
     auto *indicatorScreen = mainScreen->getIndicatorScreen();
 
     auto *viewModel = indicatorScreen->viewModel;
     viewModel->takeLock();
-    viewModel->linearSpeed = twist.linear.x;
-    viewModel->angularSpeed = twist.angular.z;
+    viewModel->linearSpeed = odometry.twist.twist.linear.x;
+    viewModel->angularSpeed = odometry.twist.twist.angular.z;
+    viewModel->xPosition = odometry.pose.pose.position.x;
+    viewModel->yPosition = odometry.pose.pose.position.y;
     viewModel->giveLock();
 }

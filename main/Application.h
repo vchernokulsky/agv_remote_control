@@ -32,7 +32,7 @@ private:
     void wiFiEventCallback(WiFiStatus wiFiStatus, const std::string& reason);
     void connectToRosCallback(const std::string& platformName);
     void disconnectFromRosCallback();
-    void navigationMessageCallback(const geometry_msgs::Twist &twist);
+    void positionMessageCallback(const nav_msgs::Odometry &odometry);
 };
 
 
