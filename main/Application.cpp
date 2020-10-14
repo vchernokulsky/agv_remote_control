@@ -130,7 +130,7 @@ void Application::positionMessageCallback(const nav_msgs::Odometry &odometry) {
     auto *viewModel = indicatorScreen->viewModel;
     viewModel->takeLock();
     viewModel->linearSpeed = odometry.twist.twist.linear.x;
-    viewModel->angularSpeed = odometry.twist.twist.angular.z;
+    viewModel->angularSpeed = -odometry.twist.twist.angular.z; //FYI: invert value because turtlesim return invalid sign
     viewModel->xPosition = odometry.pose.pose.position.x;
     viewModel->yPosition = odometry.pose.pose.position.y;
     viewModel->giveLock();
