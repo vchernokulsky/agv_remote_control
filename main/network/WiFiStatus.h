@@ -8,8 +8,13 @@
 enum class WiFiStatus {
     NotConnected,
     Connecting,
-    ConnectionEstablished,
     ConnectionFailed,
+    ConnectionEstablished,
+    ConnectionStrange_0,
+    ConnectionStrange_25,
+    ConnectionStrange_50,
+    ConnectionStrange_75,
+    ConnectionStrange_100,
 };
 
 #endif //AGV_REMOTE_CONTROL_WIFISTATUS_H

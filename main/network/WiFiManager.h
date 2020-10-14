@@ -11,6 +11,8 @@
 #include <string>
 #include <esp_supplicant/esp_wps.h>
 #include <esp_event_base.h>
+#include <freertos/FreeRTOS.h>
+#include <freertos/timers.h>
 
 #include "WiFiStatus.h"
 
@@ -49,12 +51,19 @@ private:
                                                void* eventData);
 
     void wiFiEventHandler(esp_event_base_t eventBase, int32_t eventId, void *eventData);
-
     void gotIpEventHandler(esp_event_base_t eventBase, int32_t eventId, void *eventData);
 
+    TimerHandle_t strangeMeasurementsTimer = nullptr;
+
+    void startStrangeMeasurements();
+    void stopStrangeMeasurements();
+    static void strangeMeasurementsTimerHandler(TimerHandle_t timer);
+
     static esp_wps_config_t getWpsConfig();
+    static WiFiStatus wiFiStrangeStatus(int8_t rssi);
 
     void fireWiFiEvent(WiFiStatus wiFiStatus, const std::string &reason) const;
+    void fireStrangeMeasurementEvent();
 };
 
 

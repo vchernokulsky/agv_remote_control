@@ -6,7 +6,6 @@
 #include "WiFiManager.h"
 
 #include <cstring>
-#include <utility>
 #include <esp_log.h>
 #include <esp_netif.h>
 #include <esp_event.h>
@@ -121,7 +120,7 @@ void WiFiManager::gotIpEventHandlerWrapper(void* eventHandlerArg,
     static_cast<WiFiManager *>(eventHandlerArg)->gotIpEventHandler(eventBase, eventId, eventData);
 }
 
-void WiFiManager::wiFiEventHandler(__unused esp_event_base_t eventBase,
+void WiFiManager::wiFiEventHandler(esp_event_base_t eventBase,
                                    int32_t eventId,
                                    void* eventData) {
     switch (eventId) {
@@ -141,6 +140,7 @@ void WiFiManager::wiFiEventHandler(__unused esp_event_base_t eventBase,
             ESP_LOGD(LOG_TAG, "Connected to AP");
             isWiFiConnectionEstablished = true;
             fireWiFiEvent(WiFiStatus::ConnectionEstablished, "Successfully connected to Wi-Fi");
+            startStrangeMeasurements();
             break;
         }
         case WIFI_EVENT_STA_DISCONNECTED: {
@@ -148,6 +148,7 @@ void WiFiManager::wiFiEventHandler(__unused esp_event_base_t eventBase,
             ESP_LOGW(LOG_TAG, "Disconnected from AP. Reason: %d", event->reason);
             isWiFiConnectionEstablished = false;
             fireWiFiEvent(WiFiStatus::ConnectionFailed, "Connection to Wi-Fi failed"); //TODO: add detail reason
+            stopStrangeMeasurements();
             break;
         }
         case WIFI_EVENT_STA_WPS_ER_SUCCESS: {
@@ -193,8 +194,8 @@ void WiFiManager::wiFiEventHandler(__unused esp_event_base_t eventBase,
 }
 
 //TODO: Looks like this handler and related code is unusable in our case and should be removed in the future.
-void WiFiManager::gotIpEventHandler(__unused esp_event_base_t eventBase,
-                                    __unused int32_t eventId,
+void WiFiManager::gotIpEventHandler(esp_event_base_t eventBase,
+                                    int32_t eventId,
                                     void* eventData) {
     auto* event = (ip_event_got_ip_t*) eventData;
 
@@ -214,7 +215,84 @@ esp_wps_config_t WiFiManager::getWpsConfig() {
     return espWpsConfig;
 }
 
+void WiFiManager::startStrangeMeasurements() {
+    if (strangeMeasurementsTimer != nullptr) {
+        ESP_LOGW(LOG_TAG, "Wi-Fi strange measurement timer already started.");
+        return;
+    }
+
+    strangeMeasurementsTimer = xTimerCreate(
+            "strange-measurements-timer",
+            pdMS_TO_TICKS(1000), //TODO: fix magic constant
+            pdTRUE,
+            this,
+            strangeMeasurementsTimerHandler);
+
+    if (xTimerStart(strangeMeasurementsTimer, 0) == pdFALSE) {
+        ESP_LOGE(LOG_TAG, "Can't start Wi-Fi strange measurement timer.");
+        abort();
+    }
+}
+
+void WiFiManager::stopStrangeMeasurements() {
+    if (strangeMeasurementsTimer == nullptr) {
+        ESP_LOGW(LOG_TAG, "Wi-Fi strange measurement timer already stopped.");
+        return;
+    }
+
+    if (xTimerStop(strangeMeasurementsTimer, 0) == pdFALSE) {
+        ESP_LOGE(LOG_TAG, "Can't stop Wi-Fi strange measurement timer.");
+        abort();
+    }
+
+    if (xTimerDelete(strangeMeasurementsTimer, 0) == pdFALSE) {
+        ESP_LOGE(LOG_TAG, "Can't delete Wi-Fi strange measurement timer.");
+        abort();
+    }
+
+    strangeMeasurementsTimer = nullptr;
+}
+
+void WiFiManager::strangeMeasurementsTimerHandler(TimerHandle_t timer) {
+    void *arg = pvTimerGetTimerID(timer);
+    auto *wiFiManager = static_cast<WiFiManager *>(arg);
+    wiFiManager->fireStrangeMeasurementEvent();
+}
+
 void WiFiManager::fireWiFiEvent(WiFiStatus wiFiStatus, const std::string &reason) const {
     if (onWiFiEvent)
         onWiFiEvent(wiFiStatus, reason);
+}
+
+void WiFiManager::fireStrangeMeasurementEvent() {
+    wifi_ap_record_t wifiApRecord;
+    switch (esp_wifi_sta_get_ap_info(&wifiApRecord)) {
+        case ESP_OK: {
+            ESP_LOGI(LOG_TAG, "Wi-Fi RSSI: %d", wifiApRecord.rssi);
+
+            fireWiFiEvent(wiFiStrangeStatus(wifiApRecord.rssi), "");
+            break;
+        }
+        case ESP_ERR_WIFI_CONN: {
+            ESP_LOGW(LOG_TAG, "Wi-Fi is not initialized yet.");
+            break;
+        }
+        case ESP_ERR_WIFI_NOT_CONNECT: {
+            ESP_LOGW(LOG_TAG, "Wi-Fi is not connected yet.");
+            break;
+        }
+    };
+}
+
+WiFiStatus WiFiManager::wiFiStrangeStatus(int8_t rssi) {
+    if (rssi >= -55)
+        return WiFiStatus::ConnectionStrange_100;
+    else if (rssi >= -75)
+        return WiFiStatus::ConnectionStrange_75;
+    else if (rssi >= -85)
+        return WiFiStatus::ConnectionStrange_50;
+    else if (rssi >= -96)
+        return WiFiStatus::ConnectionStrange_25;
+
+    return WiFiStatus::ConnectionStrange_0;
 }
