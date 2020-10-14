@@ -10,7 +10,7 @@
 #include <esp_log.h>
 #include <esp_netif.h>
 
-#include <utility>
+using namespace std::placeholders;
 
 void Application::start() {
     lvGlApp = new LvGlApp();
@@ -21,7 +21,7 @@ void Application::start() {
     lvGlApp->runEventLoop();
 
     wiFiManager = new WiFiManager();
-    wiFiManager->onWiFiEvent = [this](WiFiStatus wiFiStatus, std::string reason) { wiFiEventCallback(wiFiStatus, std::move(reason)); };
+    wiFiManager->onWiFiEvent = std::bind(&Application::wiFiEventCallback, this, _1, _2);
 
     ESP_LOGI("Main", "Wi-Fi Client Starting...");
     wiFiManager->start_wifi_client();

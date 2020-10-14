@@ -32,8 +32,8 @@ public:
     // returns milliseconds since start of program
     unsigned long time();
 
-    std::function<void()> onConnect = nullptr;
-    std::function<void()> onDisconnect = nullptr;
+    std::function<void()> onConnect;
+    std::function<void()> onDisconnect;
 };
 
 #endif //AGV_REMOTE_CONTROL_ESP32HARDWARE_H

@@ -30,8 +30,8 @@ public:
     bool read(uint8_t &data);
     bool write(uint8_t *data, int length);
 
-    std::function<void()> onConnect = nullptr;
-    std::function<void()> onDisconnect = nullptr;
+    std::function<void()> onConnect;
+    std::function<void()> onDisconnect;
 
 private:
     bool waitConnection();

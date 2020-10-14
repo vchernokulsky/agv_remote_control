@@ -197,11 +197,11 @@ bool TcpClient::waitConnection() {
 }
 
 void TcpClient::fireOnConnect() const {
-    if (onConnect != nullptr)
+    if (onConnect)
         onConnect();
 }
 
 void TcpClient::fireOnDisconnect() const {
-    if (onDisconnect != nullptr)
+    if (onDisconnect)
         onDisconnect();
 }

@@ -101,7 +101,7 @@ bool RosClient::sendNavigationMessage(double linearSpeed, double angularSpeed) {
 }
 
 void RosClient::positionMessageSubscriberHandler(const nav_msgs::Odometry &message) {
-    if (onPositionMessage != nullptr)
+    if (onPositionMessage)
         onPositionMessage(message);
 }
 
@@ -138,11 +138,11 @@ bool RosClient::readParam(const std::string &paramName, std::string &value) {
 }
 
 void RosClient::fireOnConnect() {
-    if (onConnect != nullptr)
+    if (onConnect)
         onConnect(PlatformName);
 }
 
 void RosClient::fireOnDisconnect() const {
-    if (onDisconnect != nullptr)
+    if (onDisconnect)
         onDisconnect();
 }

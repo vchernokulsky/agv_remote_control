@@ -18,7 +18,7 @@ public:
     ButtonsManager();
     virtual ~ButtonsManager();
 
-    std::function<void()> onMenuButton = nullptr;
+    std::function<void()> onMenuButton;
 };
 
 

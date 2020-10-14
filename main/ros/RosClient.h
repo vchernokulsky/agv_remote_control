@@ -54,9 +54,9 @@ public:
     double getMaxLinearSpeed() const { return MaxLinearSpeed; }
     double getMaxAngularSpeed() const { return MaxAngularSpeed; }
 
-    std::function<void(const std::string &platformName)> onConnect = nullptr;
-    std::function<void()> onDisconnect = nullptr;
-    std::function<void(const nav_msgs::Odometry &message)> onPositionMessage = nullptr;
+    std::function<void(const std::string &platformName)> onConnect;
+    std::function<void()> onDisconnect;
+    std::function<void(const nav_msgs::Odometry &message)> onPositionMessage;
 
 private:
     void task() override;

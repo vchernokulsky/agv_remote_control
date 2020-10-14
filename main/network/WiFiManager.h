@@ -35,7 +35,7 @@ public:
     void connect(const std::string &ssid, const std::string &password);
     void disconnect();
 
-    std::function<void(WiFiStatus wiFiStatus, std::string reason)> onWiFiEvent = nullptr;
+    std::function<void(WiFiStatus wiFiStatus, const std::string &reason)> onWiFiEvent;
 
 private:
     static void wiFiEventHandlerWrapper(void* eventHandlerArg,
@@ -54,7 +54,7 @@ private:
 
     static esp_wps_config_t getWpsConfig();
 
-    void fireWiFiEvent(WiFiStatus wiFiStatus, std::string reason) const;
+    void fireWiFiEvent(WiFiStatus wiFiStatus, const std::string &reason) const;
 };
 
 

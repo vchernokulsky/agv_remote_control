@@ -214,7 +214,7 @@ esp_wps_config_t WiFiManager::getWpsConfig() {
     return espWpsConfig;
 }
 
-void WiFiManager::fireWiFiEvent(WiFiStatus wiFiStatus, std::string reason) const {
-    if (onWiFiEvent != nullptr)
-        onWiFiEvent(wiFiStatus, std::move(reason));
+void WiFiManager::fireWiFiEvent(WiFiStatus wiFiStatus, const std::string &reason) const {
+    if (onWiFiEvent)
+        onWiFiEvent(wiFiStatus, reason);
 }
