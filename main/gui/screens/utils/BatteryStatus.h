@@ -7,15 +7,12 @@
 
 
 enum class BatteryStatus {
-    NotFound,
-    Percent25,
-    Percent50,
-    Percent75,
-    Percent100,
-    ChargingPercent25,
-    ChargingPercent50,
-    ChargingPercent75,
-    ChargingPercent100,
+    Level0,
+    Level25,
+    Level50,
+    Level75,
+    Level100,
+    Charging,
 };
 
 char const* batteryStatusSymbol(BatteryStatus status);

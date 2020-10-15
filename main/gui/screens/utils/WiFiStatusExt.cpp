@@ -6,29 +6,26 @@
 
 
 #include <cstdlib>
-#include "../assets/MaterialDesignIconsFont.h"
+#include "../assets/IconsFont.h"
 
-//TODO: fix icons
 char const* wiFiStatusSymbol(WiFiStatus status) {
     switch (status) {
         case WiFiStatus::NotConnected:
-            return "-";
+            return ICO_SYMBOL_WIFI_NOT_CONNECTED;
         case WiFiStatus::Connecting:
-            return "~";
+            return ICO_SYMBOL_WIFI_CONNECTING;
         case WiFiStatus::ConnectionEstablished:
-            return "+";
-        case WiFiStatus::ConnectionStrange_0:
-            return "0";
-        case WiFiStatus::ConnectionStrange_25:
-            return "1";
-        case WiFiStatus::ConnectionStrange_50:
-            return "2";
-        case WiFiStatus::ConnectionStrange_75:
-            return "3";
-        case WiFiStatus::ConnectionStrange_100:
-            return "4";
+            return ICO_SYMBOL_WIFI_CONNECTED;
         case WiFiStatus::ConnectionFailed:
-            return "!";
+            return ICO_SYMBOL_WIFI_FAILED;
+        case WiFiStatus::ConnectionQuality_25:
+            return ICO_SYMBOL_WIFI_QUALITY_25;
+        case WiFiStatus::ConnectionQuality_50:
+            return ICO_SYMBOL_WIFI_QUALITY_50;
+        case WiFiStatus::ConnectionQuality_75:
+            return ICO_SYMBOL_WIFI_QUALITY_75;
+        case WiFiStatus::ConnectionQuality_100:
+            return ICO_SYMBOL_WIFI_QUALITY_100;
     }
 
     abort();

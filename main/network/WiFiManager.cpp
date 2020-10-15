@@ -286,13 +286,11 @@ void WiFiManager::fireStrangeMeasurementEvent() {
 
 WiFiStatus WiFiManager::wiFiStrangeStatus(int8_t rssi) {
     if (rssi >= -55)
-        return WiFiStatus::ConnectionStrange_100;
+        return WiFiStatus::ConnectionQuality_100;
     else if (rssi >= -75)
-        return WiFiStatus::ConnectionStrange_75;
+        return WiFiStatus::ConnectionQuality_75;
     else if (rssi >= -85)
-        return WiFiStatus::ConnectionStrange_50;
-    else if (rssi >= -96)
-        return WiFiStatus::ConnectionStrange_25;
+        return WiFiStatus::ConnectionQuality_50;
 
-    return WiFiStatus::ConnectionStrange_0;
+    return WiFiStatus::ConnectionQuality_25;
 }

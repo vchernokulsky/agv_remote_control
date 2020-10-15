@@ -22,7 +22,7 @@ public:
     std::string platformName;
 
     WiFiStatus wiFiStatus = WiFiStatus::NotConnected;
-    BatteryStatus batteryStatus = BatteryStatus::NotFound;
+    BatteryStatus batteryStatus = BatteryStatus::Level0;
 
     double linearSpeed = 0.0;
     double angularSpeed = 0.0;

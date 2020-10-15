@@ -8,7 +8,7 @@
 #include <cstdlib>
 #include <gui/screens/utils/StringExt.h>
 #include "assets/Background.h"
-#include "assets/MaterialDesignIconsFont.h"
+#include "assets/IconsFont.h"
 #include "utils/MapValue.h"
 #include "utils/GaugeExt.h"
 
@@ -39,13 +39,13 @@ void IndicatorsScreen::initializeGui() {
 
     lblWiFiStatus = lv_label_create(screen, nullptr);
     lv_label_set_align(lblWiFiStatus, LV_LABEL_ALIGN_CENTER);
-//    lv_obj_set_style_local_text_font(lblWiFiStatus, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &MaterialDesignIconsFont);
+    lv_obj_set_style_local_text_font(lblWiFiStatus, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &IconsFont);
     lv_obj_set_size(lblWiFiStatus, 20, 20);
     lv_obj_align(lblWiFiStatus, nullptr, LV_ALIGN_IN_TOP_RIGHT, -25, 5);
 
     lblBatteryStatus = lv_label_create(screen, nullptr);
     lv_label_set_align(lblBatteryStatus, LV_LABEL_ALIGN_CENTER);
-    lv_obj_set_style_local_text_font(lblBatteryStatus, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &MaterialDesignIconsFont);
+    lv_obj_set_style_local_text_font(lblBatteryStatus, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &IconsFont);
     lv_obj_set_size(lblBatteryStatus, 20, 20);
     lv_obj_align(lblBatteryStatus, nullptr, LV_ALIGN_IN_TOP_RIGHT, -5, 5);
 
