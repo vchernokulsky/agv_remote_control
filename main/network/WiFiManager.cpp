@@ -266,6 +266,8 @@ void WiFiManager::fireWiFiEvent(WiFiStatus wiFiStatus, const std::string &reason
 
 void WiFiManager::fireSignalQualityEvent() {
     wifi_ap_record_t wifiApRecord;
+    //FYI: esp_wifi_sta_get_ap_info can corrupt stack
+    //     see https://github.com/espressif/esp-idf/issues/5980 for more details
     switch (esp_wifi_sta_get_ap_info(&wifiApRecord)) {
         case ESP_OK: {
             WiFiStatus wiFiStatus = wiFiQualityStatus(wifiApRecord.rssi);
