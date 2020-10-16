@@ -28,11 +28,11 @@ public:
 
     WiFiManager();
 
-    void start_wifi_client();
-    void stop_wifi_client();
+    void startWiFiClient();
+    void stopWiFiClient();
 
-    void start_wps();
-    void stop_wps();
+    void startWps();
+    void stopWps();
 
     void connect();
     void connect(const std::string &ssid, const std::string &password);

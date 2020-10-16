@@ -19,7 +19,7 @@ WiFiManager::WiFiManager() {
     ESP_ERROR_CHECK(esp_netif_init());
 }
 
-void WiFiManager::start_wifi_client() {
+void WiFiManager::startWiFiClient() {
     assert(!isWiFiClientStarted);
 
     ESP_LOGV(LOG_TAG, "Start STA Wi-Fi client");
@@ -38,7 +38,7 @@ void WiFiManager::start_wifi_client() {
     ESP_ERROR_CHECK(esp_wifi_start());
 }
 
-void WiFiManager::stop_wifi_client() {
+void WiFiManager::stopWiFiClient() {
     assert(isWiFiClientStarted);
 
     ESP_LOGV(LOG_TAG, "Stop STA Wi-Fi client");
@@ -53,7 +53,7 @@ void WiFiManager::stop_wifi_client() {
     ESP_ERROR_CHECK(esp_event_loop_delete_default());
 }
 
-void WiFiManager::start_wps() {
+void WiFiManager::startWps() {
     assert(isWiFiClientStarted);
 
     ESP_LOGV(LOG_TAG, "Start Wi-Fi WPS");
@@ -63,7 +63,7 @@ void WiFiManager::start_wps() {
     ESP_ERROR_CHECK(esp_wifi_wps_start(0));
 }
 
-void WiFiManager::stop_wps() {
+void WiFiManager::stopWps() {
     assert(isWiFiClientStarted);
 
     ESP_LOGV(LOG_TAG, "Stop Wi-Fi WPS");

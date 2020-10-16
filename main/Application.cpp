@@ -24,7 +24,7 @@ void Application::start() {
     wiFiManager->onWiFiEvent = std::bind(&Application::wiFiEventCallback, this, _1, _2);
 
     ESP_LOGI("Main", "Wi-Fi Client Starting...");
-    wiFiManager->start_wifi_client();
+    wiFiManager->startWiFiClient();
     while(!wiFiManager->isWiFiClientStarted)
         vTaskDelay(pdMS_TO_TICKS(500));
     ESP_LOGI("Main", "Wi-Fi Client Started...");
@@ -83,7 +83,7 @@ void Application::stop() {
     rosClient = nullptr;
 
     wiFiManager->disconnect();
-    wiFiManager->stop_wifi_client();
+    wiFiManager->stopWiFiClient();
     delete wiFiManager;
     wiFiManager = nullptr;
 
