@@ -268,9 +268,11 @@ void WiFiManager::fireStrangeMeasurementEvent() {
     wifi_ap_record_t wifiApRecord;
     switch (esp_wifi_sta_get_ap_info(&wifiApRecord)) {
         case ESP_OK: {
-            ESP_LOGI(LOG_TAG, "Wi-Fi RSSI: %d", wifiApRecord.rssi);
+            WiFiStatus wiFiStatus = wiFiStrangeStatus(wifiApRecord.rssi);
 
-            fireWiFiEvent(wiFiStrangeStatus(wifiApRecord.rssi), "");
+            ESP_LOGV(LOG_TAG, "Wi-Fi RSSI: %d dB (status id: %d)", wifiApRecord.rssi, (int32_t)wiFiStatus);
+
+            fireWiFiEvent(wiFiStatus, "");
             break;
         }
         case ESP_ERR_WIFI_CONN: {
