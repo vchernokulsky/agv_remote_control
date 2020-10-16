@@ -268,7 +268,8 @@ void WiFiManager::fireSignalQualityEvent() {
     wifi_ap_record_t wifiApRecord;
     //FYI: esp_wifi_sta_get_ap_info can corrupt stack
     //     see https://github.com/espressif/esp-idf/issues/5980 for more details
-    switch (esp_wifi_sta_get_ap_info(&wifiApRecord)) {
+    esp_err_t result = esp_wifi_sta_get_ap_info(&wifiApRecord);
+    switch (result) {
         case ESP_OK: {
             WiFiStatus wiFiStatus = wiFiQualityStatus(wifiApRecord.rssi);
 
@@ -283,6 +284,10 @@ void WiFiManager::fireSignalQualityEvent() {
         }
         case ESP_ERR_WIFI_NOT_CONNECT: {
             ESP_LOGW(LOG_TAG, "Wi-Fi is not connected yet.");
+            break;
+        }
+        default: {
+            ESP_LOGE(LOG_TAG, "Unexpected result: %d", result);
             break;
         }
     };
