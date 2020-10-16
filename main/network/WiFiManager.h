@@ -64,7 +64,7 @@ private:
     static WiFiStatus wiFiQualityStatus(int8_t rssi);
 
     void fireWiFiEvent(WiFiStatus wiFiStatus, const std::string &reason) const;
-    void fireStrangeMeasurementEvent();
+    void fireSignalQualityEvent();
 };
 
 

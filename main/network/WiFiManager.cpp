@@ -256,7 +256,7 @@ void WiFiManager::stopMonitoringOfSignalQuality() {
 void WiFiManager::monitoringOfSignalQualityTimerHandler(TimerHandle_t timer) {
     void *arg = pvTimerGetTimerID(timer);
     auto *wiFiManager = static_cast<WiFiManager *>(arg);
-    wiFiManager->fireStrangeMeasurementEvent();
+    wiFiManager->fireSignalQualityEvent();
 }
 
 void WiFiManager::fireWiFiEvent(WiFiStatus wiFiStatus, const std::string &reason) const {
@@ -264,7 +264,7 @@ void WiFiManager::fireWiFiEvent(WiFiStatus wiFiStatus, const std::string &reason
         onWiFiEvent(wiFiStatus, reason);
 }
 
-void WiFiManager::fireStrangeMeasurementEvent() {
+void WiFiManager::fireSignalQualityEvent() {
     wifi_ap_record_t wifiApRecord;
     switch (esp_wifi_sta_get_ap_info(&wifiApRecord)) {
         case ESP_OK: {
