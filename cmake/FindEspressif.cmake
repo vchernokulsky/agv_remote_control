@@ -1,30 +1,31 @@
 IF (NOT DEFINED ENV{IDF_PYTHON_ENV_PATH})
-    SET(ESPRESSIF_PATH $ENV{HOME}/.espressif)
+    EXECUTE_PROCESS(
+            COMMAND ${ESP_IDF_PATH}/tools/idf_tools.py export --format key-value
+            WORKING_DIRECTORY ${ESP_IDF_PATH}/tools
+            OUTPUT_VARIABLE IDF_TOOLS_EXPORT)
 
-    IF (NOT EXISTS ${ESPRESSIF_PATH})
-        message(FATAL_ERROR "'${ESPRESSIF_PATH}' directory with Espressif tools not found. "
-                "See 'Step 3. Set up the tools' by link https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/index.html#id3")
-    ENDIF()
+    STRING(REGEX REPLACE "\n" ";" IDF_TOOLS_EXPORT "${IDF_TOOLS_EXPORT}")
 
-    # Find Python environment directory
-    file(GLOB PYTHON_ENV_DIR "${ESPRESSIF_PATH}/python_env/*")
+    FOREACH (IDF_TOOLS_EXPORT_LINE IN ITEMS ${IDF_TOOLS_EXPORT})
+        IF(IDF_TOOLS_EXPORT_LINE MATCHES "(.*)=(.*)")
+            SET(KEY ${CMAKE_MATCH_1})
+            SET(VALUE ${CMAKE_MATCH_2})
 
-    file(GLOB XTENSA_ESP32_ELF_DIR "${ESPRESSIF_PATH}/tools/xtensa-esp32-elf/*/xtensa-esp32-elf")
-    file(GLOB XTENSA_ESP32S2_ELF_DIR "${ESPRESSIF_PATH}/tools/xtensa-esp32s2-elf/*/xtensa-esp32s2-elf")
-    file(GLOB XESP32ULP_ELF_DIR "${ESPRESSIF_PATH}/tools/esp32ulp-elf/*/esp32ulp-elf-binutils")
-    file(GLOB XESP32S2ULP_ELF_DIR "${ESPRESSIF_PATH}/tools/esp32s2ulp-elf/*/esp32s2ulp-elf-binutils")
-    file(GLOB OPENOCD_ESP32_DIR "${ESPRESSIF_PATH}/tools/openocd-esp32/*/openocd-esp32")
+            IF (${KEY} STREQUAL "IDF_PYTHON_ENV_PATH")
+                SET(ENV{IDF_PYTHON_ENV_PATH} ${VALUE})
+                SET(ENV{PYTHON} ${VALUE}/bin/python)
+            ELSEIF (${KEY} STREQUAL "OPENOCD_SCRIPTS")
+                SET(ENV{OPENOCD_SCRIPTS} ${VALUE})
+            ELSEIF (${KEY} STREQUAL "PATH")
+                STRING(REGEX REPLACE ":" ";" PATH_ITEMS "${VALUE}")
 
-    # Set env variables with Python environment directory and executable Python file
-    SET(ENV{IDF_PYTHON_ENV_PATH} ${PYTHON_ENV_DIR})
-    SET(ENV{PYTHON} ${PYTHON_ENV_DIR}/bin/python)
+                FOREACH(PATH_ITEM IN ITEMS ${PATH_ITEMS})
+                    IF (NOT ${PATH_ITEM} STREQUAL "$PATH")
+                        LIST(APPEND CMAKE_SYSTEM_PROGRAM_PATH ${PATH_ITEM})
+                    ENDIF()
+                ENDFOREACH(PATH_ITEM)
+            ENDIF()
 
-    # Set additional look-up paths (i.e. with C/CPP compilers, etc.)
-    LIST(APPEND CMAKE_SYSTEM_PROGRAM_PATH
-            "${XTENSA_ESP32_ELF_DIR}/bin"
-            "${XTENSA_ESP32S2_ELF_DIR}/bin"
-            "${XESP32ULP_ELF_DIR}/bin"
-            "${XESP32S2ULP_ELF_DIR}/bin"
-            "${OPENOCD_ESP32_DIR}/bin"
-            "${PYTHON_ENV_DIR}/bin")
+        ENDIF()
+    ENDFOREACH(IDF_TOOLS_EXPORT_LINE)
 ENDIF()
