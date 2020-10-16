@@ -12,7 +12,7 @@
 #include <network/MDnsManager.h>
 #include <ros/RosClient.h>
 #include <navigation/NavigationManager.h>
-#include <navigation/ButtonsManager.h>
+#include <buttons/ButtonsManager.h>
 #include <battery/BatteryManager.h>
 
 class Application {
