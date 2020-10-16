@@ -140,7 +140,7 @@ void WiFiManager::wiFiEventHandler(esp_event_base_t eventBase,
             ESP_LOGD(LOG_TAG, "Connected to AP");
             isWiFiConnectionEstablished = true;
             fireWiFiEvent(WiFiStatus::ConnectionEstablished, "Successfully connected to Wi-Fi");
-            startStrangeMeasurements();
+            startMonitoringOfSignalQuality();
             break;
         }
         case WIFI_EVENT_STA_DISCONNECTED: {
@@ -148,7 +148,7 @@ void WiFiManager::wiFiEventHandler(esp_event_base_t eventBase,
             ESP_LOGW(LOG_TAG, "Disconnected from AP. Reason: %d", event->reason);
             isWiFiConnectionEstablished = false;
             fireWiFiEvent(WiFiStatus::ConnectionFailed, "Connection to Wi-Fi failed"); //TODO: add detail reason
-            stopStrangeMeasurements();
+            stopMonitoringOfSignalQuality();
             break;
         }
         case WIFI_EVENT_STA_WPS_ER_SUCCESS: {
@@ -215,45 +215,45 @@ esp_wps_config_t WiFiManager::getWpsConfig() {
     return espWpsConfig;
 }
 
-void WiFiManager::startStrangeMeasurements() {
-    if (strangeMeasurementsTimer != nullptr) {
-        ESP_LOGW(LOG_TAG, "Wi-Fi strange measurement timer already started.");
+void WiFiManager::startMonitoringOfSignalQuality() {
+    if (monitoringOfSignalQualityTimer != nullptr) {
+        ESP_LOGW(LOG_TAG, "Quality monitoring timer of Wi-Fi signal already started.");
         return;
     }
 
-    strangeMeasurementsTimer = xTimerCreate(
-            "strange-measurements-timer",
+    monitoringOfSignalQualityTimer = xTimerCreate(
+            "signal-quality-timer",
             pdMS_TO_TICKS(1000), //TODO: fix magic constant
             pdTRUE,
             this,
-            strangeMeasurementsTimerHandler);
+            monitoringOfSignalQualityTimerHandler);
 
-    if (xTimerStart(strangeMeasurementsTimer, 0) == pdFALSE) {
-        ESP_LOGE(LOG_TAG, "Can't start Wi-Fi strange measurement timer.");
+    if (xTimerStart(monitoringOfSignalQualityTimer, 0) == pdFALSE) {
+        ESP_LOGE(LOG_TAG, "Can't start quality monitoring timer of Wi-Fi signal.");
         abort();
     }
 }
 
-void WiFiManager::stopStrangeMeasurements() {
-    if (strangeMeasurementsTimer == nullptr) {
-        ESP_LOGW(LOG_TAG, "Wi-Fi strange measurement timer already stopped.");
+void WiFiManager::stopMonitoringOfSignalQuality() {
+    if (monitoringOfSignalQualityTimer == nullptr) {
+        ESP_LOGW(LOG_TAG, "Quality monitoring timer of Wi-Fi signal already stopped.");
         return;
     }
 
-    if (xTimerStop(strangeMeasurementsTimer, 0) == pdFALSE) {
-        ESP_LOGE(LOG_TAG, "Can't stop Wi-Fi strange measurement timer.");
+    if (xTimerStop(monitoringOfSignalQualityTimer, 0) == pdFALSE) {
+        ESP_LOGE(LOG_TAG, "Can't stop quality monitoring timer of Wi-Fi signal.");
         abort();
     }
 
-    if (xTimerDelete(strangeMeasurementsTimer, 0) == pdFALSE) {
-        ESP_LOGE(LOG_TAG, "Can't delete Wi-Fi strange measurement timer.");
+    if (xTimerDelete(monitoringOfSignalQualityTimer, 0) == pdFALSE) {
+        ESP_LOGE(LOG_TAG, "Can't delete quality monitoring timer of Wi-Fi signal.");
         abort();
     }
 
-    strangeMeasurementsTimer = nullptr;
+    monitoringOfSignalQualityTimer = nullptr;
 }
 
-void WiFiManager::strangeMeasurementsTimerHandler(TimerHandle_t timer) {
+void WiFiManager::monitoringOfSignalQualityTimerHandler(TimerHandle_t timer) {
     void *arg = pvTimerGetTimerID(timer);
     auto *wiFiManager = static_cast<WiFiManager *>(arg);
     wiFiManager->fireStrangeMeasurementEvent();

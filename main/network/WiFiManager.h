@@ -53,11 +53,11 @@ private:
     void wiFiEventHandler(esp_event_base_t eventBase, int32_t eventId, void *eventData);
     void gotIpEventHandler(esp_event_base_t eventBase, int32_t eventId, void *eventData);
 
-    TimerHandle_t strangeMeasurementsTimer = nullptr;
+    TimerHandle_t monitoringOfSignalQualityTimer = nullptr;
 
-    void startStrangeMeasurements();
-    void stopStrangeMeasurements();
-    static void strangeMeasurementsTimerHandler(TimerHandle_t timer);
+    void startMonitoringOfSignalQuality();
+    void stopMonitoringOfSignalQuality();
+    static void monitoringOfSignalQualityTimerHandler(TimerHandle_t timer);
 
     static esp_wps_config_t getWpsConfig();
     static WiFiStatus wiFiStrangeStatus(int8_t rssi);
