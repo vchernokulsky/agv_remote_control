@@ -19,6 +19,7 @@
 class WiFiManager {
 private:
     const char *LOG_TAG = "WiFiManager";
+    const uint32_t MONITORING_OF_SIGNAL_QUALITY_INTERVAL = 5000; // ms
 
     esp_wps_config_t wpsConfig = {};
 public:

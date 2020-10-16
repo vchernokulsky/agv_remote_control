@@ -223,7 +223,7 @@ void WiFiManager::startMonitoringOfSignalQuality() {
 
     monitoringOfSignalQualityTimer = xTimerCreate(
             "signal-quality-timer",
-            pdMS_TO_TICKS(1000), //TODO: fix magic constant
+            pdMS_TO_TICKS(MONITORING_OF_SIGNAL_QUALITY_INTERVAL),
             pdTRUE,
             this,
             monitoringOfSignalQualityTimerHandler);
