@@ -13,6 +13,7 @@
 #include <ros/RosClient.h>
 #include <navigation/NavigationManager.h>
 #include <navigation/ButtonsManager.h>
+#include <battery/BatteryManager.h>
 
 class Application {
 private:
@@ -25,6 +26,7 @@ private:
 
     NavigationManager *navigationManager = nullptr;
     ButtonsManager *buttonsManager = nullptr;
+    BatteryManager *batteryManager = nullptr;
 
 public:
     void start();
@@ -36,6 +38,7 @@ private:
     void disconnectFromRosCallback();
     void positionMessageCallback(const nav_msgs::Odometry &odometry);
     void menuButtonCallback();
+    void batteryStatusChangedCallback(const BatteryStatus batteryStatus);
 };
 
 

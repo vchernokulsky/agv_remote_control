@@ -15,6 +15,4 @@ enum class BatteryStatus {
     Charging,
 };
 
-char const* batteryStatusSymbol(BatteryStatus status);
-
 #endif //AGV_REMOTE_CONTROL_BATTERYSTATUS_H

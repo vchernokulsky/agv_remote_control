@@ -9,7 +9,7 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
 #include <network/WiFiStatus.h>
-#include <gui/screens/utils/BatteryStatus.h>
+#include <gui/screens/utils/BatteryStatusExt.h>
 #include <gui/screens/utils/PlatformStatus.h>
 
 class IndicatorsViewModel {

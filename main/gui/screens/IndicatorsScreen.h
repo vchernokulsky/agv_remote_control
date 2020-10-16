@@ -11,7 +11,7 @@
 #include <cmath>
 #include <string>
 #include "utils/WiFiStatusExt.h"
-#include "utils/BatteryStatus.h"
+#include "utils/BatteryStatusExt.h"
 #include "utils/PlatformStatus.h"
 #include "IndicatorsViewModel.h"
 

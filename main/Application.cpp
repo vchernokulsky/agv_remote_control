@@ -68,9 +68,17 @@ void Application::start() {
 
     buttonsManager = new ButtonsManager();
     buttonsManager->onMenuButton = [this]() { menuButtonCallback(); };
+
+    batteryManager = new BatteryManager();
+    batteryManager->onBatteryStatusChanged = std::bind(&Application::batteryStatusChangedCallback, this, _1);
+    batteryManager->start();
 }
 
 void Application::stop() {
+    batteryManager->stop();
+    delete batteryManager;
+    batteryManager = nullptr;
+
     delete buttonsManager;
     buttonsManager = nullptr;
 
@@ -138,4 +146,13 @@ void Application::positionMessageCallback(const nav_msgs::Odometry &odometry) {
 
 void Application::menuButtonCallback() {
     mainScreen->toggleScreen();
+}
+
+void Application::batteryStatusChangedCallback(const BatteryStatus batteryStatus) {
+    auto *indicatorScreen = mainScreen->getIndicatorScreen();
+
+    auto *viewModel = indicatorScreen->viewModel;
+    viewModel->takeLock();
+    viewModel->batteryStatus = batteryStatus;
+    viewModel->giveLock();
 }

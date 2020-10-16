@@ -2,7 +2,7 @@
 // Created by Maxim Dobryakov on 09/10/2020.
 //
 
-#include "BatteryStatus.h"
+#include "BatteryStatusExt.h"
 
 #include <cstdlib>
 #include "../assets/IconsFont.h"
