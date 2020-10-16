@@ -8,7 +8,7 @@
 #include <freertos/task.h>
 #include <esp_log.h>
 
-void TaskBase::runTask(const std::string &taskName, BaseType_t taskPriority, uint32_t stackDepth) {
+void TaskBase::runTask(const std::string &taskName, UBaseType_t taskPriority, uint32_t stackDepth) {
     assert(taskHandle == nullptr);
 
     ESP_LOGV(taskName.c_str(), "Run task");
