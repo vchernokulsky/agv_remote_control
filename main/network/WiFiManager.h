@@ -60,7 +60,7 @@ private:
     static void monitoringOfSignalQualityTimerHandler(TimerHandle_t timer);
 
     static esp_wps_config_t getWpsConfig();
-    static WiFiStatus wiFiStrangeStatus(int8_t rssi);
+    static WiFiStatus wiFiQualityStatus(int8_t rssi);
 
     void fireWiFiEvent(WiFiStatus wiFiStatus, const std::string &reason) const;
     void fireStrangeMeasurementEvent();

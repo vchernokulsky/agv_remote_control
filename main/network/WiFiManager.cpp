@@ -268,7 +268,7 @@ void WiFiManager::fireStrangeMeasurementEvent() {
     wifi_ap_record_t wifiApRecord;
     switch (esp_wifi_sta_get_ap_info(&wifiApRecord)) {
         case ESP_OK: {
-            WiFiStatus wiFiStatus = wiFiStrangeStatus(wifiApRecord.rssi);
+            WiFiStatus wiFiStatus = wiFiQualityStatus(wifiApRecord.rssi);
 
             ESP_LOGV(LOG_TAG, "Wi-Fi RSSI: %d dB (status id: %d)", wifiApRecord.rssi, (int32_t)wiFiStatus);
 
@@ -286,7 +286,7 @@ void WiFiManager::fireStrangeMeasurementEvent() {
     };
 }
 
-WiFiStatus WiFiManager::wiFiStrangeStatus(int8_t rssi) {
+WiFiStatus WiFiManager::wiFiQualityStatus(int8_t rssi) {
     if (rssi >= -55)
         return WiFiStatus::ConnectionQuality_100;
     else if (rssi >= -75)
