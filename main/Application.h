@@ -38,7 +38,7 @@ private:
     void disconnectFromRosCallback();
     void positionMessageCallback(const nav_msgs::Odometry &odometry);
     void menuButtonCallback();
-    void batteryStatusChangedCallback(const BatteryStatus batteryStatus);
+    void batteryStatusChangedCallback(BatteryStatus batteryStatus);
 };
 
 
