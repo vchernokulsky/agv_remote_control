@@ -10,6 +10,8 @@
 
 const char *RosClient::LOG_TAG = "RosClient";
 
+using namespace std::placeholders;
+
 RosClient::RosClient(uint32_t rosMasterAddress, uint16_t rosMasterPort) :
     rosMasterAddress(rosMasterAddress),
     rosMasterPort(rosMasterPort)
@@ -22,8 +24,8 @@ void RosClient::connect() {
     ESP_LOGV(LOG_TAG, "Initialize connection to ROS");
 
     nodeHandle = new NodeHandle();
-    nodeHandle->getHardware()->onConnect = [this]() { fireOnConnect(); };
-    nodeHandle->getHardware()->onDisconnect = [this]() { fireOnDisconnect(); };
+    nodeHandle->getHardware()->onConnect = std::bind(&RosClient::fireOnConnect, this);
+    nodeHandle->getHardware()->onDisconnect = std::bind(&RosClient::fireOnDisconnect, this);
     nodeHandle->initNode(rosMasterAddress, rosMasterPort);
 
     navigationMessagePublisher = new ros::Publisher(CONFIG_AGV_RC_ROS_NAVIGATION_TOPIC_NAME, &navigationMessage);

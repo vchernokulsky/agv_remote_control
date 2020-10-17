@@ -61,11 +61,11 @@ void Application::start() {
     ESP_LOGI("Main", "ROS Master: " IPSTR ":%d", IP2STR(&rosManagerIp4), rosManagerPort);
 
     rosClient = new RosClient(rosManagerIp4.addr, rosManagerPort);
-    rosClient->onConnect = [this](const std::string& platformName) { connectToRosCallback(platformName); };
-    rosClient->onDisconnect = [this]() { disconnectFromRosCallback(); };
-    rosClient->onPositionMessage = [this](const nav_msgs::Odometry &message) { positionMessageCallback(message); };
-    rosClient->onPlatformStatusMessage = [this](const PlatformStatus platformStatus) { platformStatusMessageCallback(platformStatus); };
-    rosClient->onLogMessage = [this](const rosserial_msgs::Log &message) { logMessageCallback(message); };
+    rosClient->onConnect = std::bind(&Application::connectToRosCallback, this, _1);
+    rosClient->onDisconnect = std::bind(&Application::disconnectFromRosCallback, this);
+    rosClient->onPositionMessage = std::bind(&Application::positionMessageCallback, this, _1);
+    rosClient->onPlatformStatusMessage = std::bind(&Application::platformStatusMessageCallback, this, _1);
+    rosClient->onLogMessage = std::bind(&Application::logMessageCallback, this, _1);
     rosClient->connect();
 
     navigationManager = new NavigationManager(rosClient);
