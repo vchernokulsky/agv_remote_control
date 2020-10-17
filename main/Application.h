@@ -38,9 +38,11 @@ private:
     void disconnectFromRosCallback();
     void positionMessageCallback(const nav_msgs::Odometry &odometry);
     void platformStatusMessageCallback(PlatformStatus platformStatus);
-    void logMessageCallback(const std::string &log);
+    void logMessageCallback(const rosserial_msgs::Log &message);
     void menuButtonCallback();
     void batteryStatusChangedCallback(BatteryStatus batteryStatus);
+
+    static lv_color_t logLevelColor(uint8_t level);
 };
 
 

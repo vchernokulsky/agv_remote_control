@@ -13,8 +13,8 @@
 #include <geometry_msgs/Twist.h>
 #include <geometry_msgs/Point.h>
 #include <nav_msgs/Odometry.h>
+#include <rosserial_msgs/Log.h>
 #include <std_msgs/Int32.h>
-#include <std_msgs/String.h>
 #include "utils/TaskBase.h"
 #include "PlatformStatus.h"
 
@@ -42,7 +42,7 @@ private:
     ros::Publisher *navigationMessagePublisher = nullptr;
     ros::Subscriber<nav_msgs::Odometry, RosClient> *positionMessageSubscriber = nullptr;
     ros::Subscriber<std_msgs::Int32, RosClient> *platformStatusMessageSubscriber = nullptr;
-    ros::Subscriber<std_msgs::String, RosClient> *logMessageSubscriber = nullptr;
+    ros::Subscriber<rosserial_msgs::Log, RosClient> *logMessageSubscriber = nullptr;
 
     std::string PlatformName;
     double MaxLinearSpeed = 1; // m/sec (initiated by default value)
@@ -64,14 +64,14 @@ public:
     std::function<void()> onDisconnect;
     std::function<void(const nav_msgs::Odometry &message)> onPositionMessage;
     std::function<void(const PlatformStatus platformStatus)> onPlatformStatusMessage;
-    std::function<void(const std::string &log)> onLogMessage;
+    std::function<void(const rosserial_msgs::Log &message)> onLogMessage;
 
 private:
     void task() override;
 
     void positionMessageSubscriberHandler(const nav_msgs::Odometry &message);
     void platformStatusMessageSubscriberHandler(const std_msgs::Int32 &message);
-    void logMessageSubscriberHandler(const std_msgs::String &message);
+    void logMessageSubscriberHandler(const rosserial_msgs::Log &message);
 
     bool readParam(const std::string &paramName, double &value);
     bool readParam(const std::string &paramName, std::string &value);

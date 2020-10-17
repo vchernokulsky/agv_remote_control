@@ -23,7 +23,7 @@ public:
     void initializeGui() override;
     void deinitializeGui() override;
 
-    void addLine(const std::string &line);
+    void addLine(const std::string &line, lv_color_t color);
 };
 
 

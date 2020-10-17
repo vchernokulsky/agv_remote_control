@@ -65,7 +65,7 @@ void Application::start() {
     rosClient->onDisconnect = [this]() { disconnectFromRosCallback(); };
     rosClient->onPositionMessage = [this](const nav_msgs::Odometry &message) { positionMessageCallback(message); };
     rosClient->onPlatformStatusMessage = [this](const PlatformStatus platformStatus) { platformStatusMessageCallback(platformStatus); };
-    rosClient->onLogMessage = [this](const std::string &log) { logMessageCallback(log); };
+    rosClient->onLogMessage = [this](const rosserial_msgs::Log &message) { logMessageCallback(message); };
     rosClient->connect();
 
     navigationManager = new NavigationManager(rosClient);
@@ -115,7 +115,7 @@ void Application::wiFiEventCallback(WiFiStatus wiFiStatus, const std::string& re
 
     if (wiFiStatus == WiFiStatus::ConnectionFailed) {
         auto *logScreen = mainScreen->getLogScreen();
-        logScreen->addLine(std::string("Wi-Fi: ") + reason);
+        logScreen->addLine(std::string("Wi-Fi: ") + reason, logLevelColor(rosserial_msgs::Log::FATAL));
     }
 }
 
@@ -158,9 +158,9 @@ void Application::platformStatusMessageCallback(const PlatformStatus platformSta
     viewModel->giveLock();
 }
 
-void Application::logMessageCallback(const std::string &log) {
+void Application::logMessageCallback(const rosserial_msgs::Log &message) {
     auto *logScreen = mainScreen->getLogScreen();
-    logScreen->addLine(log);
+    logScreen->addLine(message.msg, logLevelColor(message.level));
 }
 
 void Application::menuButtonCallback() {
@@ -174,4 +174,18 @@ void Application::batteryStatusChangedCallback(const BatteryStatus batteryStatus
     viewModel->takeLock();
     viewModel->batteryStatus = batteryStatus;
     viewModel->giveLock();
+}
+
+lv_color_t Application::logLevelColor(uint8_t level) {
+    switch (level) {
+        case rosserial_msgs::Log::INFO:
+            return lv_color_make(211, 215, 207);
+        case rosserial_msgs::Log::WARN:
+            return lv_color_make(252, 233, 79);
+        case rosserial_msgs::Log::ERROR:
+        case rosserial_msgs::Log::FATAL:
+            return lv_color_make(239, 41, 41);
+        default:
+            return lv_color_make(0, 0, 0);
+    }
 }

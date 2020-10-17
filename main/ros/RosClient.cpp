@@ -50,7 +50,7 @@ void RosClient::connect() {
         abort();
     }
 
-    logMessageSubscriber = new ros::Subscriber<std_msgs::String, RosClient>(
+    logMessageSubscriber = new ros::Subscriber<rosserial_msgs::Log, RosClient>(
             LOG_TOPIC_NAME.c_str(),
             &RosClient::logMessageSubscriberHandler,
             this);
@@ -143,9 +143,9 @@ void RosClient::platformStatusMessageSubscriberHandler(const std_msgs::Int32 &me
         onPlatformStatusMessage((PlatformStatus)message.data);
 }
 
-void RosClient::logMessageSubscriberHandler(const std_msgs::String &message) {
+void RosClient::logMessageSubscriberHandler(const rosserial_msgs::Log &message) {
     if (onLogMessage)
-        onLogMessage(message.data);
+        onLogMessage(message);
 }
 
 bool RosClient::readParam(const std::string &paramName, double &value) {

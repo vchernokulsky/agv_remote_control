@@ -31,7 +31,7 @@ void LogScreen::deinitializeGui() {
     lv_obj_del(lstLog);
 }
 
-void LogScreen::addLine(const std::string &line) {
+void LogScreen::addLine(const std::string &line, lv_color_t color) {
     beginUpdate();
     uint16_t listSize = lv_list_get_size(lstLog);
     if (listSize == 7) {
@@ -41,5 +41,6 @@ void LogScreen::addLine(const std::string &line) {
     lv_obj_t *button = lv_list_add_btn(lstLog, nullptr, line.c_str());
     lv_obj_t *label = lv_list_get_btn_label(button);
     lv_label_set_long_mode(label, LV_LABEL_LONG_DOT);
+    lv_obj_set_style_local_text_color(label, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, color);
     endUpdate();
 }
