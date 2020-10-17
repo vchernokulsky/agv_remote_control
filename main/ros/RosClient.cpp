@@ -50,6 +50,15 @@ void RosClient::connect() {
         abort();
     }
 
+    logMessageSubscriber = new ros::Subscriber<std_msgs::String, RosClient>(
+            LOG_TOPIC_NAME.c_str(),
+            &RosClient::logMessageSubscriberHandler,
+            this);
+    if(!nodeHandle->subscribe(*logMessageSubscriber)) {
+        ESP_LOGE(LOG_TAG, "Can't subscribe log subscriber. Achieved MAX_SUBSCRIBERS limit.");
+        abort();
+    }
+
     while (!nodeHandle->connected()) {
         ESP_LOGD(LOG_TAG, "Wait connection to ROS Master...");
 
@@ -94,6 +103,12 @@ void RosClient::disconnect() {
     // delete platformStatusMessageSubscriber;
     //platformStatusMessageSubscriber = nullptr;
 
+    //TODO: error: deleting object of polymorphic class type 'ros::Subscriber<std_msgs::String, RosClient>' which has
+    //      non-virtual destructor might cause undefined behavior [-Werror=delete-non-virtual-dtor]
+    //
+    // delete logMessageSubscriber;
+    //logMessageSubscriber = nullptr;
+
     fireOnDisconnect();
 }
 
@@ -126,6 +141,11 @@ void RosClient::positionMessageSubscriberHandler(const nav_msgs::Odometry &messa
 void RosClient::platformStatusMessageSubscriberHandler(const std_msgs::Int32 &message) {
     if (onPlatformStatusMessage)
         onPlatformStatusMessage((PlatformStatus)message.data);
+}
+
+void RosClient::logMessageSubscriberHandler(const std_msgs::String &message) {
+    if (onLogMessage)
+        onLogMessage(message.data);
 }
 
 bool RosClient::readParam(const std::string &paramName, double &value) {

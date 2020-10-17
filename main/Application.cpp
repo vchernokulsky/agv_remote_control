@@ -65,6 +65,7 @@ void Application::start() {
     rosClient->onDisconnect = [this]() { disconnectFromRosCallback(); };
     rosClient->onPositionMessage = [this](const nav_msgs::Odometry &message) { positionMessageCallback(message); };
     rosClient->onPlatformStatusMessage = [this](const PlatformStatus platformStatus) { platformStatusMessageCallback(platformStatus); };
+    rosClient->onLogMessage = [this](const std::string &log) { logMessageCallback(log); };
     rosClient->connect();
 
     navigationManager = new NavigationManager(rosClient);
@@ -155,6 +156,11 @@ void Application::platformStatusMessageCallback(const PlatformStatus platformSta
     viewModel->takeLock();
     viewModel->platformStatus = platformStatus;
     viewModel->giveLock();
+}
+
+void Application::logMessageCallback(const std::string &log) {
+    auto *logScreen = mainScreen->getLogScreen();
+    logScreen->addLine(log);
 }
 
 void Application::menuButtonCallback() {
