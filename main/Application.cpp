@@ -122,7 +122,7 @@ void Application::connectToRosCallback(const std::string& platformName) {
 
     auto *viewModel = indicatorScreen->viewModel;
     viewModel->takeLock();
-    viewModel->platformName = platformName.empty() ? IndicatorsScreen::PLATFORM_NOT_CONNECTED : platformName;
+    viewModel->platformName = platformName.empty() ? IndicatorsViewModel::PLATFORM_NOT_CONNECTED : platformName;
     viewModel->giveLock();
 }
 
@@ -131,7 +131,7 @@ void Application::disconnectFromRosCallback() {
 
     auto *viewModel = indicatorScreen->viewModel;
     viewModel->takeLock();
-    viewModel->platformName = IndicatorsScreen::PLATFORM_NOT_CONNECTED;
+    viewModel->platformName = IndicatorsViewModel::PLATFORM_NOT_CONNECTED;
     viewModel->giveLock();
 }
 

@@ -16,8 +16,6 @@ using namespace std;
 
 const char *IndicatorsScreen::LOG_TAG = "IndicatorsScreen";
 
-const std::string IndicatorsScreen::PLATFORM_NOT_CONNECTED = "Платформа не подключена";
-
 const lv_color_t IndicatorsScreen::NEEDLE_COLORS[] = { lv_color_make(255, 0, 0) };
 
 IndicatorsScreen::IndicatorsScreen(SemaphoreHandle_t guiSemaphore) : ScreenBase(guiSemaphore) {

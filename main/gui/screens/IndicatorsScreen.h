@@ -51,8 +51,6 @@ private:
 
     lv_task_t *updateUiTaskHandle = nullptr;
 public:
-    static const std::string PLATFORM_NOT_CONNECTED;
-
     IndicatorsViewModel *viewModel = nullptr;
 
     explicit IndicatorsScreen(SemaphoreHandle_t guiSemaphore);

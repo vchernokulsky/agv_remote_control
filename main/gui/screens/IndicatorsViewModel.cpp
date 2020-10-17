@@ -9,6 +9,8 @@
 
 const char *IndicatorsViewModel::LOG_TAG = "IndicatorsViewModel";
 
+const std::string IndicatorsViewModel::PLATFORM_NOT_CONNECTED = "Платформа не подключена";
+
 IndicatorsViewModel::IndicatorsViewModel() {
     semaphoreHandle = xSemaphoreCreateMutex();
 }

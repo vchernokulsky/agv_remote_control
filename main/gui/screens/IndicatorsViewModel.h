@@ -19,7 +19,9 @@ private:
     SemaphoreHandle_t semaphoreHandle = nullptr;
 
 public:
-    std::string platformName;
+    static const std::string PLATFORM_NOT_CONNECTED;
+
+    std::string platformName = PLATFORM_NOT_CONNECTED;
 
     WiFiStatus wiFiStatus = WiFiStatus::NotConnected;
     BatteryStatus batteryStatus = BatteryStatus::Level0;
