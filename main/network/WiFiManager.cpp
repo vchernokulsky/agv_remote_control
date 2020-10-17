@@ -141,7 +141,7 @@ void WiFiManager::wiFiEventHandler(esp_event_base_t eventBase,
         case WIFI_EVENT_STA_CONNECTED: {
             ESP_LOGD(LOG_TAG, "Connected to AP");
             isWiFiConnectionEstablished = true;
-            fireWiFiEvent(WiFiStatus::ConnectionEstablished, "Successfully connected to Wi-Fi");
+            fireWiFiEvent(WiFiStatus::ConnectionEstablished, "");
             startMonitoringOfSignalQuality();
             break;
         }
@@ -149,7 +149,7 @@ void WiFiManager::wiFiEventHandler(esp_event_base_t eventBase,
             auto *event = (wifi_event_sta_disconnected_t *)eventData;
             ESP_LOGW(LOG_TAG, "Disconnected from AP. Reason: %d", event->reason);
             isWiFiConnectionEstablished = false;
-            fireWiFiEvent(WiFiStatus::ConnectionFailed, "Connection to Wi-Fi failed"); //TODO: add detail reason
+            fireWiFiEvent(WiFiStatus::ConnectionFailed, reasonCodeToString((wifi_err_reason_t)event->reason));
             stopMonitoringOfSignalQuality();
             break;
         }
@@ -304,4 +304,46 @@ WiFiStatus WiFiManager::wiFiQualityStatus(int8_t rssi) {
         return WiFiStatus::ConnectionQuality_50;
 
     return WiFiStatus::ConnectionQuality_25;
+}
+
+std::string WiFiManager::reasonCodeToString(wifi_err_reason_t reason) {
+    switch (reason) {
+        case WIFI_REASON_UNSPECIFIED:
+        case WIFI_REASON_AUTH_EXPIRE:
+        case WIFI_REASON_AUTH_LEAVE:
+        case WIFI_REASON_ASSOC_EXPIRE:
+        case WIFI_REASON_ASSOC_TOOMANY:
+        case WIFI_REASON_NOT_AUTHED:
+        case WIFI_REASON_NOT_ASSOCED:
+        case WIFI_REASON_ASSOC_LEAVE:
+        case WIFI_REASON_ASSOC_NOT_AUTHED:
+        case WIFI_REASON_DISASSOC_PWRCAP_BAD:
+        case WIFI_REASON_DISASSOC_SUPCHAN_BAD:
+        case WIFI_REASON_IE_INVALID:
+        case WIFI_REASON_MIC_FAILURE:
+        case WIFI_REASON_GROUP_KEY_UPDATE_TIMEOUT:
+        case WIFI_REASON_IE_IN_4WAY_DIFFERS:
+        case WIFI_REASON_GROUP_CIPHER_INVALID:
+        case WIFI_REASON_PAIRWISE_CIPHER_INVALID:
+        case WIFI_REASON_AKMP_INVALID:
+        case WIFI_REASON_UNSUPP_RSN_IE_VERSION:
+        case WIFI_REASON_INVALID_RSN_IE_CAP:
+        case WIFI_REASON_802_1X_AUTH_FAILED:
+        case WIFI_REASON_CIPHER_SUITE_REJECTED:
+        case WIFI_REASON_INVALID_PMKID:
+        case WIFI_REASON_BEACON_TIMEOUT:
+        case WIFI_REASON_ASSOC_FAIL:
+        case WIFI_REASON_HANDSHAKE_TIMEOUT:
+        case WIFI_REASON_CONNECTION_FAIL:
+        case WIFI_REASON_AP_TSF_RESET:
+            return std::string("Ошибка: ") + std::to_string((int32_t)reason);
+        case WIFI_REASON_4WAY_HANDSHAKE_TIMEOUT:
+            return std::string("Неверный пароль (") + std::to_string((int32_t)reason) + std::string(")");
+        case WIFI_REASON_NO_AP_FOUND:
+            return "Неверный SSID";
+        case WIFI_REASON_AUTH_FAIL:
+            return "Ошибка аутентификации";
+        default:
+            return std::string("Неизвестная ошибка: ") + std::to_string((int32_t)reason);
+    }
 }

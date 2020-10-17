@@ -5,8 +5,10 @@
 #ifndef AGV_REMOTE_CONTROL_LOGSCREEN_H
 #define AGV_REMOTE_CONTROL_LOGSCREEN_H
 
-
 #include "../ScreenBase.h"
+
+
+#include <string>
 
 class LogScreen : public ScreenBase {
 private:
@@ -21,7 +23,7 @@ public:
     void initializeGui() override;
     void deinitializeGui() override;
 
-    void addLine(const char *line);
+    void addLine(const std::string &line);
 };
 
 

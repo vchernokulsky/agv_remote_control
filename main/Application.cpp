@@ -20,6 +20,9 @@ void Application::start() {
     lvGlApp->setMainScreen(mainScreen);
     lvGlApp->runEventLoop();
 
+    buttonsManager = new ButtonsManager();
+    buttonsManager->onMenuButton = std::bind(&Application::menuButtonCallback, this);
+
     wiFiManager = new WiFiManager();
     wiFiManager->onWiFiEvent = std::bind(&Application::wiFiEventCallback, this, _1, _2);
 
@@ -66,9 +69,6 @@ void Application::start() {
     navigationManager = new NavigationManager(rosClient);
     navigationManager->start();
 
-    buttonsManager = new ButtonsManager();
-    buttonsManager->onMenuButton = [this]() { menuButtonCallback(); };
-
     batteryManager = new BatteryManager();
     batteryManager->onBatteryStatusChanged = std::bind(&Application::batteryStatusChangedCallback, this, _1);
     batteryManager->start();
@@ -78,9 +78,6 @@ void Application::stop() {
     batteryManager->stop();
     delete batteryManager;
     batteryManager = nullptr;
-
-    delete buttonsManager;
-    buttonsManager = nullptr;
 
     navigationManager->stop(true);
     delete navigationManager;
@@ -94,6 +91,9 @@ void Application::stop() {
     wiFiManager->stopWiFiClient();
     delete wiFiManager;
     wiFiManager = nullptr;
+
+    delete buttonsManager;
+    buttonsManager = nullptr;
 
     lvGlApp->cancelEventLoop(); //TODO: wait
     delete lvGlApp;
@@ -111,7 +111,10 @@ void Application::wiFiEventCallback(WiFiStatus wiFiStatus, const std::string& re
     viewModel->wiFiStatus = wiFiStatus;
     viewModel->giveLock();
 
-    //TODO: write reason to log
+    if (wiFiStatus == WiFiStatus::ConnectionFailed) {
+        auto *logScreen = mainScreen->getLogScreen();
+        logScreen->addLine(std::string("Wi-Fi: ") + reason);
+    }
 }
 
 void Application::connectToRosCallback(const std::string& platformName) {

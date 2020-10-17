@@ -31,13 +31,15 @@ void LogScreen::deinitializeGui() {
     lv_obj_del(lstLog);
 }
 
-void LogScreen::addLine(const char *line) {
+void LogScreen::addLine(const std::string &line) {
+    beginUpdate();
     uint16_t listSize = lv_list_get_size(lstLog);
     if (listSize == 7) {
         lv_list_remove(lstLog, 0);
     }
 
-    lv_obj_t *button = lv_list_add_btn(lstLog, nullptr, line);
+    lv_obj_t *button = lv_list_add_btn(lstLog, nullptr, line.c_str());
     lv_obj_t *label = lv_list_get_btn_label(button);
     lv_label_set_long_mode(label, LV_LABEL_LONG_DOT);
+    endUpdate();
 }

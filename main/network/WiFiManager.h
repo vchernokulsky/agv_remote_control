@@ -13,6 +13,7 @@
 #include <esp_event_base.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/timers.h>
+#include <esp_wifi.h>
 
 #include "WiFiStatus.h"
 
@@ -62,6 +63,7 @@ private:
 
     static esp_wps_config_t getWpsConfig();
     static WiFiStatus wiFiQualityStatus(int8_t rssi);
+    static std::string reasonCodeToString(wifi_err_reason_t reason);
 
     void fireWiFiEvent(WiFiStatus wiFiStatus, const std::string &reason) const;
     void fireSignalQualityEvent();
