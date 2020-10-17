@@ -5,16 +5,11 @@
 #ifndef AGV_REMOTE_CONTROL_PLATFORMSTATUS_H
 #define AGV_REMOTE_CONTROL_PLATFORMSTATUS_H
 
-#include <lvgl/lvgl.h>
-
 enum class PlatformStatus {
-    UNDEFINED,
-    OK,
-    WARNING,
-    FAULT,
+    UNDEFINED = 0,
+    OK = 1,
+    WARNING = 2,
+    FAULT = 3,
 };
-
-const char *platformStatusText(PlatformStatus status);
-lv_color_t platformStatusColor(PlatformStatus status);
 
 #endif //AGV_REMOTE_CONTROL_PLATFORMSTATUS_H

@@ -2,7 +2,7 @@
 // Created by Maxim Dobryakov on 09/10/2020.
 //
 
-#include "PlatformStatus.h"
+#include "PlatformStatusExt.h"
 
 #include <cstdlib>
 

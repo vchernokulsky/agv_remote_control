@@ -45,7 +45,16 @@ void RosClient::connect() {
             &RosClient::positionMessageSubscriberHandler,
             this);
     if(!nodeHandle->subscribe(*positionMessageSubscriber)) {
-        ESP_LOGE(LOG_TAG, "Can't subscribe navigation subscriber. Achieved MAX_SUBSCRIBERS limit.");
+        ESP_LOGE(LOG_TAG, "Can't subscribe position subscriber. Achieved MAX_SUBSCRIBERS limit.");
+        abort();
+    }
+
+    platformStatusMessageSubscriber = new ros::Subscriber<std_msgs::Int32, RosClient>(
+            STATUS_TOPIC_NAME.c_str(),
+            &RosClient::platformStatusMessageSubscriberHandler,
+            this);
+    if(!nodeHandle->subscribe(*platformStatusMessageSubscriber)) {
+        ESP_LOGE(LOG_TAG, "Can't subscribe platform status subscriber. Achieved MAX_SUBSCRIBERS limit.");
         abort();
     }
 
@@ -78,6 +87,12 @@ void RosClient::disconnect() {
     // delete positionMessageSubscriber;
     //positionMessageSubscriber = nullptr;
 
+    //TODO: error: deleting object of polymorphic class type 'ros::Subscriber<std_msgs::Int32, RosClient>' which has
+    //      non-virtual destructor might cause undefined behavior [-Werror=delete-non-virtual-dtor]
+    //
+    // delete platformStatusMessageSubscriber;
+    //platformStatusMessageSubscriber = nullptr;
+
     fireOnDisconnect();
 }
 
@@ -105,6 +120,11 @@ bool RosClient::sendNavigationMessage(double linearSpeed, double angularSpeed) {
 void RosClient::positionMessageSubscriberHandler(const nav_msgs::Odometry &message) {
     if (onPositionMessage)
         onPositionMessage(message);
+}
+
+void RosClient::platformStatusMessageSubscriberHandler(const std_msgs::Int32 &message) {
+    if (onPlatformStatusMessage)
+        onPlatformStatusMessage((PlatformStatus)message.data);
 }
 
 bool RosClient::readParam(const std::string &paramName, double &value) {

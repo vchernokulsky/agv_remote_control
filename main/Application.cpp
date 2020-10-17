@@ -64,6 +64,7 @@ void Application::start() {
     rosClient->onConnect = [this](const std::string& platformName) { connectToRosCallback(platformName); };
     rosClient->onDisconnect = [this]() { disconnectFromRosCallback(); };
     rosClient->onPositionMessage = [this](const nav_msgs::Odometry &message) { positionMessageCallback(message); };
+    rosClient->onPlatformStatusMessage = [this](const PlatformStatus platformStatus) { platformStatusMessageCallback(platformStatus); };
     rosClient->connect();
 
     navigationManager = new NavigationManager(rosClient);
@@ -144,6 +145,15 @@ void Application::positionMessageCallback(const nav_msgs::Odometry &odometry) {
     viewModel->angularSpeed = -odometry.twist.twist.angular.z; //FYI: invert value because turtlesim return invalid sign
     viewModel->xPosition = odometry.pose.pose.position.x;
     viewModel->yPosition = odometry.pose.pose.position.y;
+    viewModel->giveLock();
+}
+
+void Application::platformStatusMessageCallback(const PlatformStatus platformStatus) {
+    auto *indicatorScreen = mainScreen->getIndicatorScreen();
+
+    auto *viewModel = indicatorScreen->viewModel;
+    viewModel->takeLock();
+    viewModel->platformStatus = platformStatus;
     viewModel->giveLock();
 }
 

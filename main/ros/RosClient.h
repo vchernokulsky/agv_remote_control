@@ -14,7 +14,9 @@
 #include <ros_lib/geometry_msgs/Twist.h>
 #include <ros_lib/geometry_msgs/Point.h>
 #include <ros_lib/nav_msgs/Odometry.h>
+#include <ros_lib/std_msgs/Int32.h>
 #include "utils/TaskBase.h"
+#include "PlatformStatus.h"
 
 class RosClient : TaskBase {
 private:
@@ -28,6 +30,7 @@ private:
 
     const std::string NAVIGATION_TOPIC_NAME = "/turtle1/cmd_vel";
     const std::string POSITION_TOPIC_NAME = "/turtle1/odometry";
+    const std::string STATUS_TOPIC_NAME = "/turtle1/status";
 
     uint32_t rosMasterAddress;
     uint16_t rosMasterPort;
@@ -37,6 +40,7 @@ private:
     geometry_msgs::Twist navigationMessage = {};
     ros::Publisher *navigationMessagePublisher = nullptr;
     ros::Subscriber<nav_msgs::Odometry, RosClient> *positionMessageSubscriber = nullptr;
+    ros::Subscriber<std_msgs::Int32, RosClient> *platformStatusMessageSubscriber = nullptr;
 
     std::string PlatformName;
     double MaxLinearSpeed = 1; // m/sec (initiated by default value)
@@ -57,11 +61,13 @@ public:
     std::function<void(const std::string &platformName)> onConnect;
     std::function<void()> onDisconnect;
     std::function<void(const nav_msgs::Odometry &message)> onPositionMessage;
+    std::function<void(const PlatformStatus platformStatus)> onPlatformStatusMessage;
 
 private:
     void task() override;
 
     void positionMessageSubscriberHandler(const nav_msgs::Odometry &message);
+    void platformStatusMessageSubscriberHandler(const std_msgs::Int32 &message);
 
     bool readParam(const std::string &paramName, double &value);
     bool readParam(const std::string &paramName, std::string &value);

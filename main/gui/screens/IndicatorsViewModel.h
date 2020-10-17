@@ -10,7 +10,7 @@
 #include <freertos/semphr.h>
 #include <network/WiFiStatus.h>
 #include <gui/screens/utils/BatteryStatusExt.h>
-#include <gui/screens/utils/PlatformStatus.h>
+#include <gui/screens/utils/PlatformStatusExt.h>
 
 class IndicatorsViewModel {
 private:

@@ -12,7 +12,7 @@
 #include <string>
 #include "utils/WiFiStatusExt.h"
 #include "utils/BatteryStatusExt.h"
-#include "utils/PlatformStatus.h"
+#include "utils/PlatformStatusExt.h"
 #include "IndicatorsViewModel.h"
 
 class IndicatorsScreen : public ScreenBase {
