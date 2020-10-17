@@ -8,6 +8,8 @@
 
 const char *platformStatusText(PlatformStatus status) {
     switch (status) {
+        case PlatformStatus::UNDEFINED:
+            return "?";
         case PlatformStatus::OK:
             return "OK";
         case PlatformStatus::WARNING:
@@ -21,6 +23,8 @@ const char *platformStatusText(PlatformStatus status) {
 
 lv_color_t platformStatusColor(PlatformStatus status) {
     switch (status) {
+        case PlatformStatus::UNDEFINED:
+            return lv_color_make(128, 128, 128);
         case PlatformStatus::OK:
             return lv_color_make(0, 128, 0);
         case PlatformStatus::WARNING:

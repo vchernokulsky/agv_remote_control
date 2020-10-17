@@ -96,9 +96,10 @@ void IndicatorsScreen::initializeGui() {
     lv_obj_set_size(cntPlatformStatus, 120, 30);
     lv_cont_set_layout(cntPlatformStatus, LV_LAYOUT_CENTER);
     lv_obj_align(cntPlatformStatus, nullptr, LV_ALIGN_IN_BOTTOM_RIGHT, -15, -10);
-    lv_obj_set_style_local_bg_color(cntPlatformStatus, LV_CONT_PART_MAIN, LV_STATE_DEFAULT, lv_color_make(0, 128, 0));
+    lv_obj_set_style_local_bg_color(cntPlatformStatus, LV_CONT_PART_MAIN, LV_STATE_DEFAULT, lv_color_make(128, 128, 128));
 
     lblPlatformStatus = lv_label_create(cntPlatformStatus, nullptr);
+    lv_label_set_text(lblPlatformStatus, "");
 
     updateUiTaskHandle = lv_task_create(timerTaskHandler, 100, LV_TASK_PRIO_MID, this);
 }

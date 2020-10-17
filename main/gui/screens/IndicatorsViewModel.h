@@ -32,7 +32,7 @@ public:
     double xPosition = 0.0;
     double yPosition = 0.0;
 
-    PlatformStatus platformStatus = PlatformStatus::OK;
+    PlatformStatus platformStatus = PlatformStatus::UNDEFINED;
 
 public:
     IndicatorsViewModel();

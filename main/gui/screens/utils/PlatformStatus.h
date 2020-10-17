@@ -8,6 +8,7 @@
 #include <lvgl/lvgl.h>
 
 enum class PlatformStatus {
+    UNDEFINED,
     OK,
     WARNING,
     FAULT,
