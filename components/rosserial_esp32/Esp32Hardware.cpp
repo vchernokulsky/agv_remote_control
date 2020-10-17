@@ -9,6 +9,8 @@
 #include <cassert>
 #include <esp_timer.h>
 
+const char *Esp32Hardware::LOG_TAG = "Esp32Hardware";
+
 Esp32Hardware::~Esp32Hardware() {
     assert(tcpClient != nullptr);
 

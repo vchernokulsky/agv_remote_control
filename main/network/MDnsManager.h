@@ -12,7 +12,7 @@
 
 class MDnsManager {
 private:
-    const char *LOG_TAG = "MDnsManager";
+    static const char *LOG_TAG;
 
     const uint32_t LOOKUP_TIMEOUT = 3000; // ms
 public:

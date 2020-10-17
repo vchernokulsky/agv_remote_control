@@ -18,7 +18,7 @@
 
 class RosClient : TaskBase {
 private:
-    const char *LOG_TAG = "RosClient";
+    static const char *LOG_TAG;
 
     const uint32_t LOOP_INTERVAL = 10; // ms
 

@@ -11,7 +11,7 @@
 
 class Esp32Hardware {
 private:
-    const char *LOG_TAG = "Esp32Hardware";
+    static const char *LOG_TAG;
 
     TcpClient_t tcpClient = nullptr;
 

@@ -8,6 +8,8 @@
 #include <freertos/task.h>
 #include <esp_log.h>
 
+const char *RosClient::LOG_TAG = "RosClient";
+
 RosClient::RosClient(uint32_t rosMasterAddress, uint16_t rosMasterPort) :
     rosMasterAddress(rosMasterAddress),
     rosMasterPort(rosMasterPort)

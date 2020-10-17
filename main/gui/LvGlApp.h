@@ -17,7 +17,7 @@
 
 class LvGlApp {
 private:
-    constexpr static char const *LOG_TAG = "LvGlApp";
+    static const char *LOG_TAG;
     static const uint32_t TickPeriod = 10; // ms
 
     ScreenBase *mainScreen = nullptr;

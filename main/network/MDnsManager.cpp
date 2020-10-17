@@ -7,6 +7,8 @@
 #include <esp_log.h>
 #include <mdns.h>
 
+const char *MDnsManager::LOG_TAG = "MDnsManager";
+
 MDnsManager::MDnsManager() {
     ESP_LOGV(LOG_TAG, "Initialize mDNS system");
 

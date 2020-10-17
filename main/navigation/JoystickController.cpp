@@ -10,6 +10,8 @@
 #include <driver/adc.h>
 #include <esp_adc_cal.h>
 
+const char *JoystickController::LOG_TAG = "JoystickController";
+
 JoystickController::JoystickController() {
     initializeADCDriver();
 }

@@ -12,7 +12,7 @@
 
 class JoystickController {
 private:
-    const char *LOG_TAG = "JoystickController";
+    static const char *LOG_TAG;
 
     const adc_bits_width_t ADC_BITS_WIDTH = ADC_WIDTH_BIT_12;
 

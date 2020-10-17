@@ -13,6 +13,8 @@
 #include <esp_wifi.h>
 #include <esp_supplicant/esp_wps.h>
 
+const char *WiFiManager::LOG_TAG = "WiFiManager";
+
 WiFiManager::WiFiManager() {
     ESP_LOGV(LOG_TAG, "Initialization of Wi-Fi system");
 

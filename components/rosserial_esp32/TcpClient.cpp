@@ -10,6 +10,8 @@
 #include <lwip/sockets.h>
 #include <esp_netif.h>
 
+const char *TcpClient::LOG_TAG = "TcpClient";
+
 TcpClient::TcpClient(uint32_t address, uint16_t port)
     : address(address),
       port(port) {

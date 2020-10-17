@@ -7,6 +7,8 @@
 
 #include <esp_log.h>
 
+const char *LvGlApp::LOG_TAG = "LvGlApp";
+
 LvGlApp::LvGlApp() {
     guiSemaphore = xSemaphoreCreateMutex();
 }

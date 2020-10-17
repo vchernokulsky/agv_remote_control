@@ -15,7 +15,7 @@
 
 class NavigationManager: public TaskBase {
 private:
-    const char *LOG_TAG = "NavigationManager";
+    static const char *LOG_TAG;
 
     const uint32_t MEASUREMENT_INTERVAL = 10; // ms
 

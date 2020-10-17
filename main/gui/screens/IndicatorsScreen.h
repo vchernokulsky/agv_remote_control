@@ -17,7 +17,7 @@
 
 class IndicatorsScreen : public ScreenBase {
 private:
-    constexpr static char const *LOG_TAG = "IndicatorsScreen";
+    static const char *LOG_TAG;
 
     static const lv_color_t NEEDLE_COLORS[];
 

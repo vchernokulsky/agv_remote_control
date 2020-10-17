@@ -8,6 +8,8 @@
 #include <freertos/task.h>
 #include <esp_log.h>
 
+const char *NavigationManager::LOG_TAG = "NavigationManager";
+
 NavigationManager::NavigationManager(RosClient *rosClient) :
     rosClient(rosClient)
 {

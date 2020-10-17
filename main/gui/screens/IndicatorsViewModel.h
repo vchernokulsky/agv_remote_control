@@ -14,7 +14,7 @@
 
 class IndicatorsViewModel {
 private:
-    static char const *LOG_TAG;
+    static const char *LOG_TAG;
 
     SemaphoreHandle_t semaphoreHandle = nullptr;
 

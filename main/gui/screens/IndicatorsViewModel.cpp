@@ -7,7 +7,7 @@
 
 #include <esp_log.h>
 
-char const *IndicatorsViewModel::LOG_TAG = "IndicatorsViewModel";
+const char *IndicatorsViewModel::LOG_TAG = "IndicatorsViewModel";
 
 IndicatorsViewModel::IndicatorsViewModel() {
     semaphoreHandle = xSemaphoreCreateMutex();
