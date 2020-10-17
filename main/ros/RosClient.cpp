@@ -25,14 +25,6 @@ void RosClient::connect() {
     nodeHandle->getHardware()->onConnect = [this]() { fireOnConnect(); };
     nodeHandle->getHardware()->onDisconnect = [this]() { fireOnDisconnect(); };
     nodeHandle->initNode(rosMasterAddress, rosMasterPort);
-    while (!nodeHandle->connected()) {
-        ESP_LOGD(LOG_TAG, "Wait connection to ROS Master...");
-
-        nodeHandle->spinOnce(); //FYI: Ignore useless errors from result
-
-        vTaskDelay(pdMS_TO_TICKS(1000));
-    }
-    ESP_LOGD(LOG_TAG, "Connected to ROS Master");
 
     navigationMessagePublisher = new ros::Publisher(NAVIGATION_TOPIC_NAME.c_str(), &navigationMessage);
     if(!nodeHandle->advertise(*navigationMessagePublisher)) {
@@ -57,6 +49,15 @@ void RosClient::connect() {
         ESP_LOGE(LOG_TAG, "Can't subscribe platform status subscriber. Achieved MAX_SUBSCRIBERS limit.");
         abort();
     }
+
+    while (!nodeHandle->connected()) {
+        ESP_LOGD(LOG_TAG, "Wait connection to ROS Master...");
+
+        nodeHandle->spinOnce(); //FYI: Ignore useless errors from result
+
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+    ESP_LOGD(LOG_TAG, "Connected to ROS Master");
 
     if (!readParam(PLATFORM_NAME_PARAM, PlatformName))
         ESP_LOGW(LOG_TAG, "Use default %s param value: %s", PLATFORM_NAME_PARAM.c_str(), PlatformName.c_str());
