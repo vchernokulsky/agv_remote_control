@@ -24,15 +24,6 @@ private:
 
     const uint32_t LOOP_INTERVAL = 10; // ms
 
-    const std::string PLATFORM_NAME_PARAM = "/agv_remote_control/platform_name";
-    const std::string MAX_LINEAR_SPEED_PARAM = "/agv_remote_control/max_linear_speed";
-    const std::string MAX_ANGULAR_SPEED_PARAM = "/agv_remote_control/max_angular_speed";
-
-    const std::string NAVIGATION_TOPIC_NAME = "/turtle1/cmd_vel";
-    const std::string POSITION_TOPIC_NAME = "/turtle1/odometry";
-    const std::string STATUS_TOPIC_NAME = "/turtle1/status";
-    const std::string LOG_TOPIC_NAME = "/turtle1/log";
-
     uint32_t rosMasterAddress;
     uint16_t rosMasterPort;
 

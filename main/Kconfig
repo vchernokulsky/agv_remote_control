@@ -41,4 +41,38 @@ menu "AGV Remote Control"
                 default "AGV Remote Control"
         endmenu
     endmenu
+
+    menu "ROS Settings"
+        menu "Topics"
+            config AGV_RC_ROS_NAVIGATION_TOPIC_NAME
+                string "Navigation topic"
+                default "/turtle1/cmd_vel"
+
+            config AGV_RC_ROS_POSITION_TOPIC_NAME
+                string "Position topic"
+                default "/turtle1/odometry"
+
+            config AGV_RC_ROS_STATUS_TOPIC_NAME
+                string "Platform status topic"
+                default "/turtle1/status"
+
+            config AGV_RC_ROS_LOG_TOPIC_NAME
+                string "Log topic"
+                default "/turtle1/log"
+        endmenu
+
+        menu "Params"
+            config AGV_RC_ROS_PLATFORM_NAME_PARAM
+                string "Platform name param."
+                default "/agv_remote_control/platform_name"
+
+            config AGV_RC_ROS_MAX_LINEAR_SPEED_PARAM
+                string "Linear speed param."
+                default "/agv_remote_control/max_linear_speed"
+
+            config AGV_RC_ROS_MAX_ANGULAR_SPEED_PARAM
+                string "Angular speed param."
+                default "/agv_remote_control/max_angular_speed"
+        endmenu
+    endmenu
 endmenu

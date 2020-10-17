@@ -26,14 +26,14 @@ void RosClient::connect() {
     nodeHandle->getHardware()->onDisconnect = [this]() { fireOnDisconnect(); };
     nodeHandle->initNode(rosMasterAddress, rosMasterPort);
 
-    navigationMessagePublisher = new ros::Publisher(NAVIGATION_TOPIC_NAME.c_str(), &navigationMessage);
+    navigationMessagePublisher = new ros::Publisher(CONFIG_AGV_RC_ROS_NAVIGATION_TOPIC_NAME, &navigationMessage);
     if(!nodeHandle->advertise(*navigationMessagePublisher)) {
         ESP_LOGE(LOG_TAG, "Can't advertise navigation publisher. Achieved MAX_PUBLISHERS limit.");
         abort();
     }
 
     positionMessageSubscriber = new ros::Subscriber<nav_msgs::Odometry, RosClient>(
-            POSITION_TOPIC_NAME.c_str(),
+            CONFIG_AGV_RC_ROS_POSITION_TOPIC_NAME,
             &RosClient::positionMessageSubscriberHandler,
             this);
     if(!nodeHandle->subscribe(*positionMessageSubscriber)) {
@@ -42,7 +42,7 @@ void RosClient::connect() {
     }
 
     platformStatusMessageSubscriber = new ros::Subscriber<std_msgs::Int32, RosClient>(
-            STATUS_TOPIC_NAME.c_str(),
+            CONFIG_AGV_RC_ROS_STATUS_TOPIC_NAME,
             &RosClient::platformStatusMessageSubscriberHandler,
             this);
     if(!nodeHandle->subscribe(*platformStatusMessageSubscriber)) {
@@ -51,7 +51,7 @@ void RosClient::connect() {
     }
 
     logMessageSubscriber = new ros::Subscriber<rosserial_msgs::Log, RosClient>(
-            LOG_TOPIC_NAME.c_str(),
+            CONFIG_AGV_RC_ROS_LOG_TOPIC_NAME,
             &RosClient::logMessageSubscriberHandler,
             this);
     if(!nodeHandle->subscribe(*logMessageSubscriber)) {
@@ -68,12 +68,12 @@ void RosClient::connect() {
     }
     ESP_LOGD(LOG_TAG, "Connected to ROS Master");
 
-    if (!readParam(PLATFORM_NAME_PARAM, PlatformName))
-        ESP_LOGW(LOG_TAG, "Use default %s param value: %s", PLATFORM_NAME_PARAM.c_str(), PlatformName.c_str());
-    if (!readParam(MAX_LINEAR_SPEED_PARAM, MaxLinearSpeed))
-        ESP_LOGW(LOG_TAG, "Use default %s param value: %f", MAX_LINEAR_SPEED_PARAM.c_str(), MaxLinearSpeed);
-    if (!readParam(MAX_ANGULAR_SPEED_PARAM, MaxAngularSpeed))
-        ESP_LOGW(LOG_TAG, "Use default %s param value: %f", MAX_ANGULAR_SPEED_PARAM.c_str(), MaxAngularSpeed);
+    if (!readParam(CONFIG_AGV_RC_ROS_PLATFORM_NAME_PARAM, PlatformName))
+        ESP_LOGW(LOG_TAG, "Use default %s param value: %s", CONFIG_AGV_RC_ROS_PLATFORM_NAME_PARAM, PlatformName.c_str());
+    if (!readParam(CONFIG_AGV_RC_ROS_MAX_LINEAR_SPEED_PARAM, MaxLinearSpeed))
+        ESP_LOGW(LOG_TAG, "Use default %s param value: %f", CONFIG_AGV_RC_ROS_MAX_LINEAR_SPEED_PARAM, MaxLinearSpeed);
+    if (!readParam(CONFIG_AGV_RC_ROS_MAX_ANGULAR_SPEED_PARAM, MaxAngularSpeed))
+        ESP_LOGW(LOG_TAG, "Use default %s param value: %f", CONFIG_AGV_RC_ROS_MAX_ANGULAR_SPEED_PARAM, MaxAngularSpeed);
 
     runTask("ros-client-loop", 2, 4 * configMINIMAL_STACK_SIZE);
 

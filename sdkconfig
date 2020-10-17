@@ -954,6 +954,28 @@ CONFIG_AGV_RC_WPS_MODEL_NUMBER="1.0"
 CONFIG_AGV_RC_WPS_MODEL_NAME="Prototype"
 CONFIG_AGV_RC_WPS_DEVICE_NAME="AGV Remote Control"
 # end of Wi-Fi Settings
+
+#
+# ROS Settings
+#
+
+#
+# Topics
+#
+CONFIG_AGV_RC_ROS_NAVIGATION_TOPIC_NAME="/turtle1/cmd_vel"
+CONFIG_AGV_RC_ROS_POSITION_TOPIC_NAME="/turtle1/odometry"
+CONFIG_AGV_RC_ROS_STATUS_TOPIC_NAME="/turtle1/status"
+CONFIG_AGV_RC_ROS_LOG_TOPIC_NAME="/turtle1/log"
+# end of Topics
+
+#
+# Params
+#
+CONFIG_AGV_RC_ROS_PLATFORM_NAME_PARAM="/agv_remote_control/platform_name"
+CONFIG_AGV_RC_ROS_MAX_LINEAR_SPEED_PARAM="/agv_remote_control/max_linear_speed"
+CONFIG_AGV_RC_ROS_MAX_ANGULAR_SPEED_PARAM="/agv_remote_control/max_angular_speed"
+# end of Params
+# end of ROS Settings
 # end of AGV Remote Control
 
 #
