@@ -3,7 +3,7 @@
 ROOT_PATH=$(realpath "$(dirname ${0})/../")
 
 npx lv_font_conv \
-  --size 16 \
+  --size 20 \
   --bpp 4 \
   --lcd \
   --format lvgl \
