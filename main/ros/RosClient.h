@@ -10,12 +10,11 @@
 #include <functional>
 #include <string>
 #include <ros.h>
-#include <ros_lib/ros/publisher.h>
-#include <ros_lib/geometry_msgs/Twist.h>
-#include <ros_lib/geometry_msgs/Point.h>
-#include <ros_lib/nav_msgs/Odometry.h>
-#include <ros_lib/std_msgs/Int32.h>
-#include <ros_lib/std_msgs/String.h>
+#include <geometry_msgs/Twist.h>
+#include <geometry_msgs/Point.h>
+#include <nav_msgs/Odometry.h>
+#include <std_msgs/Int32.h>
+#include <std_msgs/String.h>
 #include "utils/TaskBase.h"
 #include "PlatformStatus.h"
 
