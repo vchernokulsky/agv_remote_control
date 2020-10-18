@@ -47,13 +47,7 @@ private:
                                  int32_t eventId,
                                  void* eventData);
 
-    static void gotIpEventHandlerWrapper(void* eventHandlerArg,
-                                               esp_event_base_t eventBase,
-                                               int32_t eventId,
-                                               void* eventData);
-
     void wiFiEventHandler(esp_event_base_t eventBase, int32_t eventId, void *eventData);
-    void gotIpEventHandler(esp_event_base_t eventBase, int32_t eventId, void *eventData);
 
     TimerHandle_t monitoringOfSignalQualityTimer = nullptr;
 

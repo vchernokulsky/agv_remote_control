@@ -34,7 +34,6 @@ void WiFiManager::startWiFiClient() {
     ESP_ERROR_CHECK(esp_wifi_init(&wiFiInitConfig));
 
     ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &wiFiEventHandlerWrapper, this));
-    ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &gotIpEventHandlerWrapper, this));
 
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
     ESP_ERROR_CHECK(esp_wifi_start());
@@ -47,7 +46,6 @@ void WiFiManager::stopWiFiClient() {
 
     ESP_ERROR_CHECK(esp_wifi_stop());
 
-    ESP_ERROR_CHECK(esp_event_handler_unregister(IP_EVENT, IP_EVENT_STA_GOT_IP, &gotIpEventHandlerWrapper));
     ESP_ERROR_CHECK(esp_event_handler_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, &wiFiEventHandlerWrapper));
 
     ESP_ERROR_CHECK(esp_wifi_deinit());
@@ -113,13 +111,6 @@ void WiFiManager::wiFiEventHandlerWrapper(void* eventHandlerArg,
                                           int32_t eventId,
                                           void* eventData) {
     static_cast<WiFiManager *>(eventHandlerArg)->wiFiEventHandler(eventBase, eventId, eventData);
-}
-
-void WiFiManager::gotIpEventHandlerWrapper(void* eventHandlerArg,
-                                           esp_event_base_t eventBase,
-                                           int32_t eventId,
-                                           void* eventData) {
-    static_cast<WiFiManager *>(eventHandlerArg)->gotIpEventHandler(eventBase, eventId, eventData);
 }
 
 void WiFiManager::wiFiEventHandler(esp_event_base_t eventBase,
@@ -193,15 +184,6 @@ void WiFiManager::wiFiEventHandler(esp_event_base_t eventBase,
             break;
         }
     }
-}
-
-//TODO: Looks like this handler and related code is unusable in our case and should be removed in the future.
-void WiFiManager::gotIpEventHandler(esp_event_base_t eventBase,
-                                    int32_t eventId,
-                                    void* eventData) {
-    auto* event = (ip_event_got_ip_t*) eventData;
-
-    ESP_LOGV(LOG_TAG, "Got IP: " IPSTR, IP2STR(&event->ip_info.ip));
 }
 
 esp_wps_config_t WiFiManager::getWpsConfig() {
