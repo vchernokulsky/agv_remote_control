@@ -19,6 +19,10 @@ public:
     virtual ~ButtonsManager();
 
     std::function<void()> onMenuButton;
+
+private:
+    static void menuButtonHandler(void *arg);
+
 };
 
 
