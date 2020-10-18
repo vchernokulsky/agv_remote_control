@@ -93,23 +93,17 @@ void RosClient::disconnect() {
     delete navigationMessagePublisher;
     navigationMessagePublisher = nullptr;
 
-    //TODO: error: deleting object of polymorphic class type 'ros::Subscriber<nav_msgs::Odometry, RosClient>' which has
-    //      non-virtual destructor might cause undefined behavior [-Werror=delete-non-virtual-dtor]
-    //
-    // delete positionMessageSubscriber;
-    //positionMessageSubscriber = nullptr;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdelete-non-virtual-dtor"
+    delete positionMessageSubscriber;
+    positionMessageSubscriber = nullptr;
 
-    //TODO: error: deleting object of polymorphic class type 'ros::Subscriber<std_msgs::Int32, RosClient>' which has
-    //      non-virtual destructor might cause undefined behavior [-Werror=delete-non-virtual-dtor]
-    //
-    // delete platformStatusMessageSubscriber;
-    //platformStatusMessageSubscriber = nullptr;
+    delete platformStatusMessageSubscriber;
+    platformStatusMessageSubscriber = nullptr;
 
-    //TODO: error: deleting object of polymorphic class type 'ros::Subscriber<std_msgs::String, RosClient>' which has
-    //      non-virtual destructor might cause undefined behavior [-Werror=delete-non-virtual-dtor]
-    //
-    // delete logMessageSubscriber;
-    //logMessageSubscriber = nullptr;
+    delete logMessageSubscriber;
+    logMessageSubscriber = nullptr;
+#pragma GCC diagnostic pop
 
     fireOnDisconnect();
 }
