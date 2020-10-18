@@ -5,7 +5,7 @@
 #ifndef AGV_REMOTE_CONTROL_BUTTONSMANAGER_H
 #define AGV_REMOTE_CONTROL_BUTTONSMANAGER_H
 
-#include <include/iot_button.h>
+#include <iot_button.h>
 #include <functional>
 
 class ButtonsManager {

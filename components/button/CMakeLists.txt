@@ -1,7 +1,5 @@
+idf_component_register(
+        SRCS src/button.c src/button_obj.cpp
+        INCLUDE_DIRS src/include)
 
-set(COMPONENT_SRCS "button.c"
-                   "button_obj.cpp")
-
-set(COMPONENT_ADD_INCLUDEDIRS ". include")
-
-register_component()
+set_source_files_properties(src/button.c PROPERTIES COMPILE_FLAGS -Wno-incompatible-pointer-types)
